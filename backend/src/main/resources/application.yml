@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: inventory-tracking-accounting
+  datasource:
+    url: jdbc:postgresql://localhost:5432/inventory
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+  mvc:
+    problemdetails:
+      enabled: true
+
+server:
+  port: 8080
+
+logging:
+  level:
+    root: INFO
+    org.hibernate.SQL: INFO
+
+app:
+  jwt-secret: "dev-secret-change-me"
+
+
