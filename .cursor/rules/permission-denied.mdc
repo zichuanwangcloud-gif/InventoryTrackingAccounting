@@ -1,0 +1,21 @@
+---
+alwaysApply: true
+---
+
+# 权限修复规则
+
+## 规则说明
+当遇到Permission denied错误时，自动提供权限修复方案。
+
+## 触发条件
+- 检测到"Permission denied"错误
+- 检测到文件创建/写入失败
+- 检测到目录权限问题
+
+## 应对策略
+1. **立即解决方案**：
+   ```bash
+   # 临时修复当前目录权限
+   sudo chmod -R 775 ./
+   # 或者使用ACL
+   sudo setfacl -R -m u:$(whoami):rwx ./
