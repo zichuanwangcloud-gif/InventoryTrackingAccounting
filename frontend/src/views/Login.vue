@@ -25,8 +25,8 @@
           />
         </div>
         
-        <button type="submit" :disabled="loading" class="login-btn">
-          {{ loading ? '登录中...' : '登录' }}
+        <button type="submit" :disabled="authStore.loading" class="login-btn">
+          {{ authStore.loading ? '登录中...' : '登录' }}
         </button>
         
         <div class="form-footer">
@@ -40,9 +40,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
 
 const router = useRouter()
-const loading = ref(false)
+const authStore = useAuthStore()
 
 const form = ref({
   username: '',
@@ -50,26 +51,17 @@ const form = ref({
 })
 
 const handleLogin = async () => {
-  loading.value = true
-  
   try {
-    // TODO: 调用登录API
-    console.log('登录信息:', form.value)
+    const result = await authStore.login(form.value.username, form.value.password)
     
-    // 模拟登录成功
-    localStorage.setItem('token', 'mock-jwt-token')
-    localStorage.setItem('user', JSON.stringify({
-      id: '1',
-      username: form.value.username,
-      email: 'user@example.com'
-    }))
-    
-    router.push('/')
+    if (result.success) {
+      router.push('/')
+    } else {
+      alert(result.error || '登录失败，请检查用户名和密码')
+    }
   } catch (error) {
     console.error('登录失败:', error)
     alert('登录失败，请检查用户名和密码')
-  } finally {
-    loading.value = false
   }
 }
 </script>

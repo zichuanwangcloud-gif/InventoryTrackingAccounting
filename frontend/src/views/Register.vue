@@ -36,8 +36,8 @@
           />
         </div>
         
-        <button type="submit" :disabled="loading" class="register-btn">
-          {{ loading ? '注册中...' : '注册' }}
+        <button type="submit" :disabled="authStore.loading" class="register-btn">
+          {{ authStore.loading ? '注册中...' : '注册' }}
         </button>
         
         <div class="form-footer">
@@ -51,9 +51,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
 
 const router = useRouter()
-const loading = ref(false)
+const authStore = useAuthStore()
 
 const form = ref({
   username: '',
@@ -62,20 +63,18 @@ const form = ref({
 })
 
 const handleRegister = async () => {
-  loading.value = true
-  
   try {
-    // TODO: 调用注册API
-    console.log('注册信息:', form.value)
+    const result = await authStore.register(form.value.username, form.value.email, form.value.password)
     
-    // 模拟注册成功
-    alert('注册成功，请登录')
-    router.push('/login')
+    if (result.success) {
+      alert('注册成功，请登录')
+      router.push('/login')
+    } else {
+      alert(result.error || '注册失败，请重试')
+    }
   } catch (error) {
     console.error('注册失败:', error)
     alert('注册失败，请重试')
-  } finally {
-    loading.value = false
   }
 }
 </script>
