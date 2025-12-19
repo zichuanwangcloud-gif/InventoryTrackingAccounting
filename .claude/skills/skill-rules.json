@@ -1,0 +1,332 @@
+{
+    "version": "1.0",
+    "description": "Skill activation triggers for Claude Code. Controls when skills automatically suggest or block actions.",
+    "skills": {
+        "skill-developer": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "Meta-skill for creating and managing Claude Code skills",
+            "promptTriggers": {
+                "keywords": [
+                    "skill system",
+                    "create skill",
+                    "add skill",
+                    "skill triggers",
+                    "skill rules",
+                    "hook system",
+                    "skill development",
+                    "skill-rules.json"
+                ],
+                "intentPatterns": [
+                    "(how do|how does|explain).*?skill",
+                    "(create|add|modify|build).*?skill",
+                    "skill.*?(work|trigger|activate|system)"
+                ]
+            }
+        },
+        "agents-developer": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "Meta-skill for creating and managing Claude Code agents",
+            "promptTriggers": {
+                "keywords": [
+                    "agent system",
+                    "create agent",
+                    "add agent",
+                    "agent template",
+                    "agent structure",
+                    "agent development",
+                    "orchestrator agent",
+                    "specialist agent",
+                    "validator agent",
+                    "multi-agent",
+                    "agent coordination",
+                    "agent workflow",
+                    "agent best practices",
+                    ".claude/agents"
+                ],
+                "intentPatterns": [
+                    "(how do|how does|explain).*?agent",
+                    "(create|add|modify|build).*?agent",
+                    "agent.*?(work|structure|template|coordinate)",
+                    "(orchestrator|specialist|validator).*?agent",
+                    "multi.*?agent.*?(workflow|coordination)"
+                ]
+            },
+            "fileTriggers": {
+                "pathPatterns": [
+                    "**/.claude/agents/**/*.md",
+                    "**/.claude/agents/*.md"
+                ],
+                "contentPatterns": [
+                    "^---\\s*name:\\s*[a-z-]+",
+                    "^#\\s+.*Agent"
+                ]
+            }
+        },
+        "security-reporter": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "Security report generation - project overview, vulnerability details, structured output for CI/CD",
+            "promptTriggers": {
+                "keywords": [
+                    "security report",
+                    "安全报告",
+                    "vulnerability report",
+                    "漏洞报告",
+                    "assessment report",
+                    "audit report",
+                    "penetration test report",
+                    "渗透测试报告",
+                    "generate report",
+                    "生成报告",
+                    "export findings",
+                    "SARIF",
+                    "security summary",
+                    "executive summary",
+                    "remediation report"
+                ],
+                "intentPatterns": [
+                    "(generate|create|write|export|output).*?(security|vulnerability|audit|assessment).*?report",
+                    "(生成|创建|导出|输出).*?(安全|漏洞|审计).*?报告",
+                    "(report|summarize|document).*?(findings|vulnerabilities|issues)",
+                    "(CI/CD|pipeline).*?(security|report|output)",
+                    "(JSON|YAML|SARIF|HTML|PDF).*?(report|output|export)"
+                ]
+            }
+        },
+        "semgrep-rule-development": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "Semgrep rule development - scenario expansion, rule generation, test cases, evaluation",
+            "promptTriggers": {
+                "keywords": [
+                    "semgrep rule",
+                    "semgrep 规则",
+                    "写规则",
+                    "生成规则",
+                    "规则开发",
+                    "rule development",
+                    "create rule",
+                    "generate rule",
+                    "test case",
+                    "测试用例",
+                    "误报",
+                    "漏报",
+                    "false positive",
+                    "false negative",
+                    "rule evaluation",
+                    "规则评估"
+                ],
+                "intentPatterns": [
+                    "(create|generate|write|develop|build).*?(semgrep|sast).*?rule",
+                    "(生成|创建|编写|开发).*?(semgrep|规则)",
+                    "(evaluate|assess|test|validate).*?rule",
+                    "(评估|测试|验证).*?规则",
+                    "(误报|漏报|false.*?positive|false.*?negative).*?(分析|analysis)",
+                    "(sql.*?injection|xss|rce|ssrf).*?(rule|规则)",
+                    "场景.*?(扩展|expansion)"
+                ]
+            },
+            "fileTriggers": {
+                "pathPatterns": [
+                    "**/rules/semgrep/**/*.yml",
+                    "**/rules/semgrep/**/*.yaml",
+                    "**/semgrep-rules/**/*.yml"
+                ],
+                "contentPatterns": [
+                    "^rules:",
+                    "mode:\\s*taint",
+                    "pattern-sources:",
+                    "pattern-sinks:"
+                ]
+            }
+        },
+        "semgrep-execution": {
+            "type": "guardrail",
+            "enforcement": "block",
+            "priority": "critical",
+            "description": "Enforces strict Semgrep Docker execution standards - standardized image, local rules, security validation",
+            "promptTriggers": {
+                "keywords": [
+                    "semgrep",
+                    "Semgrep",
+                    "SAST",
+                    "static analysis",
+                    "静态分析",
+                    "semgrep scan",
+                    "semgrep-agent",
+                    "code analysis",
+                    "security scan",
+                    "vulnerability scan"
+                ],
+                "intentPatterns": [
+                    "(run|execute|perform|start).*?semgrep.*?(scan|analysis)",
+                    "(run|execute).*?(SAST|static.*?analysis)",
+                    "(use|call|invoke).*?semgrep.*?agent",
+                    "docker.*?run.*?semgrep"
+                ],
+                "excludePatterns": [
+                    "^/semgrep-fp-analysis\\s",
+                    "^/semgrep-fp-analysis$",
+                    "semgrep.*?(false.*?positive|误报|fp.*?analysis)",
+                    "analyze.*?semgrep.*?(result|output)"
+                ]
+            },
+            "toolTriggers": {
+                "tools": ["Bash"],
+                "commandPatterns": [
+                    "docker\\s+run.*?semgrep",
+                    "semgrep\\s+scan",
+                    "semgrep\\s+--config"
+                ]
+            },
+            "skipConditions": {
+                "sessionTracking": true,
+                "envVars": ["SKIP_SEMGREP_VALIDATION"],
+                "fileMarkers": ["@skip-semgrep-validation"],
+                "commands": [
+                    "/semgrep-fp-analysis"
+                ]
+            }
+        },
+        "semgrep-sqli-execution": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "Specialized SQL injection scanning with Semgrep - multi-language support (Python/Java/PHP/Go/C/C++), auto language detection, generates detailed Markdown reports",
+            "promptTriggers": {
+                "keywords": [
+                    "sql注入扫描",
+                    "sql injection scan",
+                    "sqli扫描",
+                    "扫描sql注入",
+                    "检测sql注入",
+                    "semgrep sqli",
+                    "scan sqli",
+                    "sql漏洞扫描",
+                    "database injection scan",
+                    "扫描 workspace"
+                ],
+                "intentPatterns": [
+                    "扫描.*sql.*注入",
+                    "检测.*sqli",
+                    "scan.*sql.*injection",
+                    "扫描\\s+/.*workspace/",
+                    "(analyze|scan|detect).*?sql.*?(injection|vulnerability)",
+                    "(分析|扫描|检测).*?(sql|数据库).*?(注入|漏洞)"
+                ]
+            }
+        },
+        "sink-scanner": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "Sink Scanner rule generation - high recall rate, pattern-based rules for discovering all potential security sinks",
+            "promptTriggers": {
+                "keywords": [
+                    "sink scanner",
+                    "sink 扫描",
+                    "sink规则",
+                    "高召回",
+                    "high recall",
+                    "风险点扫描",
+                    "发现sink",
+                    "sink discovery",
+                    "pattern rule",
+                    "模式规则",
+                    "sink-rules",
+                    "sink pattern"
+                ],
+                "intentPatterns": [
+                    "(generate|create|build).*?sink.*?(rule|规则)",
+                    "(生成|创建).*?sink.*?(规则|rule)",
+                    "(discover|find|identify).*?all.*?sink",
+                    "(发现|识别|扫描).*?(所有|全部).*?(sink|风险点)",
+                    "high.*?recall.*?(rule|scan)",
+                    "召回率.*?(规则|扫描)"
+                ]
+            },
+            "agentTriggers": {
+                "agents": ["sink-scanner-agent"]
+            },
+            "fileTriggers": {
+                "pathPatterns": [
+                    "**/rules/semgrep/sink-rules/**/*.yaml",
+                    "**/rules/semgrep/sink-rules/**/*.yml"
+                ],
+                "contentPatterns": [
+                    "scan_type:\\s*sink_discovery",
+                    "recall_priority:\\s*maximum"
+                ]
+            }
+        },
+        "defect-scanner": {
+            "type": "domain",
+            "enforcement": "suggest",
+            "priority": "high",
+            "description": "Defect Scanner rule generation - high precision rate, taint mode rules for confirming real security defects",
+            "promptTriggers": {
+                "keywords": [
+                    "defect scanner",
+                    "缺陷扫描",
+                    "defect规则",
+                    "高精确",
+                    "high precision",
+                    "真实漏洞",
+                    "taint mode",
+                    "污点追踪",
+                    "taint tracking",
+                    "defect-rules",
+                    "sanitizer",
+                    "净化器"
+                ],
+                "intentPatterns": [
+                    "(generate|create|build).*?defect.*?(rule|规则)",
+                    "(生成|创建).*?(defect|缺陷).*?(规则|rule)",
+                    "(confirm|verify|validate).*?(real|true).*?(vulnerability|defect)",
+                    "(确认|验证).*?(真实|真正).*?(漏洞|缺陷)",
+                    "high.*?precision.*?(rule|scan)",
+                    "精确率.*?(规则|扫描)",
+                    "taint.*?mode.*?(rule|analysis)"
+                ]
+            },
+            "agentTriggers": {
+                "agents": ["defect-scanner-agent"]
+            },
+            "fileTriggers": {
+                "pathPatterns": [
+                    "**/rules/semgrep/defect-rules/**/*.yaml",
+                    "**/rules/semgrep/defect-rules/**/*.yml"
+                ],
+                "contentPatterns": [
+                    "precision_priority:\\s*high",
+                    "mode:\\s*taint",
+                    "pattern-sanitizers:"
+                ]
+            }
+        }
+    },
+    "notes": {
+        "enforcement_types": {
+            "suggest": "Skill suggestion appears but doesn't block execution",
+            "block": "Requires skill to be used before proceeding (guardrail)",
+            "warn": "Shows warning but allows proceeding"
+        },
+        "priority_levels": {
+            "critical": "Highest - Always trigger when matched",
+            "high": "Important - Trigger for most matches",
+            "medium": "Moderate - Trigger for clear matches",
+            "low": "Optional - Trigger only for explicit matches"
+        },
+        "customization": {
+            "pathPatterns": "Adjust to match your project structure",
+            "keywords": "Add domain-specific terms relevant to your project",
+            "intentPatterns": "Use regex for flexible user intent matching"
+        }
+    }
+}

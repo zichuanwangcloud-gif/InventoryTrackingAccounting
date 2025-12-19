@@ -1,0 +1,344 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://vul-ai.local/schemas/finding.schema.json",
+  "title": "Security Finding",
+  "description": "Standard format for vulnerability findings from all vuln-agents",
+  "type": "object",
+  "required": [
+    "findingId",
+    "source",
+    "timestamp",
+    "vulnType",
+    "severity",
+    "confidence",
+    "target",
+    "evidence",
+    "description"
+  ],
+  "properties": {
+    "findingId": {
+      "type": "string",
+      "description": "Unique identifier for the finding",
+      "pattern": "^[a-z]+-[0-9]+$",
+      "examples": ["sqli-001", "xss-003", "ssrf-002"]
+    },
+    "source": {
+      "type": "string",
+      "description": "The agent that generated this finding",
+      "enum": [
+        "sqli-agent",
+        "xss-agent",
+        "ssrf-agent",
+        "rce-agent",
+        "sast-agent",
+        "fuzz-agent",
+        "sca-agent"
+      ]
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when the finding was generated"
+    },
+    "vulnType": {
+      "type": "string",
+      "description": "Type of vulnerability",
+      "enum": [
+        "sqli",
+        "xss",
+        "ssrf",
+        "rce",
+        "cmdi",
+        "path_traversal",
+        "file_upload",
+        "idor",
+        "auth_bypass",
+        "csrf",
+        "xxe",
+        "deserialization",
+        "ssti",
+        "open_redirect",
+        "info_disclosure",
+        "hardcoded_secret",
+        "other"
+      ]
+    },
+    "vulnSubtype": {
+      "type": "string",
+      "description": "Subtype of vulnerability for more specific classification",
+      "examples": [
+        "error_based",
+        "blind_time",
+        "blind_boolean",
+        "union_based",
+        "reflected",
+        "stored",
+        "dom_based"
+      ]
+    },
+    "severity": {
+      "type": "string",
+      "description": "Severity level of the vulnerability",
+      "enum": ["critical", "high", "medium", "low", "info"]
+    },
+    "confidence": {
+      "type": "string",
+      "description": "Confidence level of the finding",
+      "enum": ["high", "medium", "low"]
+    },
+    "confidenceScore": {
+      "type": "number",
+      "description": "Numeric confidence score between 0 and 1",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "target": {
+      "type": "object",
+      "description": "Location information about the vulnerability",
+      "required": ["file", "line"],
+      "properties": {
+        "endpoint": {
+          "type": "string",
+          "description": "API endpoint or URL path",
+          "examples": ["/api/login", "/search"]
+        },
+        "method": {
+          "type": "string",
+          "description": "HTTP method",
+          "enum": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"]
+        },
+        "file": {
+          "type": "string",
+          "description": "Source file path relative to project root"
+        },
+        "line": {
+          "type": "integer",
+          "description": "Line number in the source file",
+          "minimum": 1
+        },
+        "function": {
+          "type": "string",
+          "description": "Function or method name"
+        },
+        "class": {
+          "type": ["string", "null"],
+          "description": "Class name if applicable"
+        }
+      }
+    },
+    "parameter": {
+      "type": "string",
+      "description": "The vulnerable parameter or input",
+      "examples": ["username", "id", "query"]
+    },
+    "evidence": {
+      "type": "object",
+      "description": "Evidence supporting the finding",
+      "required": ["source", "sink"],
+      "properties": {
+        "source": {
+          "type": "object",
+          "description": "The source of untrusted input",
+          "required": ["type", "location"],
+          "properties": {
+            "type": {
+              "type": "string",
+              "description": "Type of input source",
+              "enum": [
+                "http_parameter",
+                "http_header",
+                "http_body",
+                "url_path",
+                "cookie",
+                "database",
+                "file",
+                "environment",
+                "user_input",
+                "external_api"
+              ]
+            },
+            "name": {
+              "type": "string",
+              "description": "Name of the parameter or field"
+            },
+            "location": {
+              "type": "string",
+              "description": "File and line number",
+              "pattern": "^.+:[0-9]+$"
+            },
+            "code": {
+              "type": "string",
+              "description": "The source code at this location"
+            }
+          }
+        },
+        "sink": {
+          "type": "object",
+          "description": "The dangerous operation (sink)",
+          "required": ["type", "location"],
+          "properties": {
+            "type": {
+              "type": "string",
+              "description": "Type of dangerous operation",
+              "enum": [
+                "sql_execution",
+                "html_output",
+                "dom_manipulation",
+                "command_execution",
+                "file_operation",
+                "http_request",
+                "deserialization",
+                "template_rendering",
+                "eval",
+                "other"
+              ]
+            },
+            "location": {
+              "type": "string",
+              "description": "File and line number",
+              "pattern": "^.+:[0-9]+$"
+            },
+            "code": {
+              "type": "string",
+              "description": "The source code at this location"
+            }
+          }
+        },
+        "dataflow": {
+          "type": "object",
+          "description": "Data flow analysis from source to sink",
+          "properties": {
+            "path": {
+              "type": "array",
+              "description": "Steps in the data flow",
+              "items": {
+                "type": "string"
+              }
+            },
+            "sanitization": {
+              "type": "string",
+              "description": "Whether sanitization was found",
+              "enum": ["none", "partial", "bypassed", "effective"]
+            },
+            "transformations": {
+              "type": "array",
+              "description": "Data transformations along the path",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "pattern": {
+          "type": "string",
+          "description": "The detected vulnerability pattern",
+          "examples": [
+            "string_concatenation",
+            "template_literal_sql",
+            "format_string",
+            "innerHTML_assignment"
+          ]
+        },
+        "codeSnippets": {
+          "type": "array",
+          "description": "Relevant code snippets",
+          "items": {
+            "type": "object",
+            "required": ["file", "startLine", "endLine", "code"],
+            "properties": {
+              "file": {
+                "type": "string",
+                "description": "Source file path"
+              },
+              "startLine": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "endLine": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "code": {
+                "type": "string",
+                "description": "The code content"
+              },
+              "highlights": {
+                "type": "array",
+                "description": "Line numbers to highlight",
+                "items": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description of the vulnerability"
+    },
+    "remediation": {
+      "type": "object",
+      "description": "Remediation guidance",
+      "properties": {
+        "recommendation": {
+          "type": "string",
+          "description": "Short recommendation for fixing"
+        },
+        "secureCode": {
+          "type": "string",
+          "description": "Example of secure code"
+        },
+        "references": {
+          "type": "array",
+          "description": "Links to relevant documentation",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      }
+    },
+    "cweIds": {
+      "type": "array",
+      "description": "Common Weakness Enumeration IDs",
+      "items": {
+        "type": "string",
+        "pattern": "^CWE-[0-9]+$"
+      }
+    },
+    "owasp": {
+      "type": "string",
+      "description": "OWASP Top 10 reference",
+      "examples": ["A01:2021", "A03:2021", "A07:2021"]
+    },
+    "testPayloads": {
+      "type": "array",
+      "description": "Suggested test payloads for verification",
+      "items": {
+        "type": "string"
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional metadata",
+      "properties": {
+        "taskId": {
+          "type": "string",
+          "description": "Reference to the threat task",
+          "pattern": "^THREAT-[0-9]+$"
+        },
+        "sessionId": {
+          "type": "string",
+          "description": "Session identifier",
+          "pattern": "^sess-[0-9]+-[0-9]+$"
+        },
+        "analysisTime": {
+          "type": "number",
+          "description": "Time taken to analyze in seconds"
+        }
+      }
+    }
+  }
+}

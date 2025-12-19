@@ -1,0 +1,93 @@
+{
+  "$schema": "https://raw.githubusercontent.com/vul-ai/schemas/main/threat-model.schema.json",
+  "meta": {
+    "version": "1.0.0",
+    "generatedAt": "",
+    "generatedBy": "threat-modeler",
+    "sourceProfile": "",
+    "projectName": ""
+  },
+  "summary": {
+    "totalThreats": 0,
+    "byPriority": {
+      "P0": 0,
+      "P1": 0,
+      "P2": 0
+    },
+    "byCategory": {},
+    "endpointsAnalyzed": 0,
+    "componentsAnalyzed": 0
+  },
+  "endpointThreats": [
+    {
+      "endpoint": {
+        "path": "",
+        "method": "",
+        "file": "",
+        "line": 0,
+        "category": ""
+      },
+      "threats": [
+        {
+          "id": "",
+          "name": "",
+          "nameZh": "",
+          "priority": "P0",
+          "cwes": [],
+          "confidence": "high",
+          "reasoning": "",
+          "checkPoints": [],
+          "suggestedAgent": ""
+        }
+      ]
+    }
+  ],
+  "componentThreats": [
+    {
+      "component": {
+        "name": "",
+        "type": "",
+        "location": ""
+      },
+      "threats": [
+        {
+          "id": "",
+          "name": "",
+          "nameZh": "",
+          "priority": "P0",
+          "cwes": [],
+          "checkPoints": []
+        }
+      ]
+    }
+  ],
+  "architectureThreats": [
+    {
+      "pattern": "",
+      "confidence": "",
+      "indicators": [],
+      "threats": [
+        {
+          "id": "",
+          "name": "",
+          "nameZh": "",
+          "priority": "P0",
+          "description": "",
+          "checkPoints": []
+        }
+      ]
+    }
+  ],
+  "frameworkThreats": [
+    {
+      "framework": "",
+      "version": "",
+      "threats": []
+    }
+  ],
+  "riskMatrix": {
+    "criticalPaths": [],
+    "highValueTargets": [],
+    "attackVectors": []
+  }
+}

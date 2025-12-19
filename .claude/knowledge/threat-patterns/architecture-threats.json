@@ -1,0 +1,454 @@
+{
+  "$schema": "https://raw.githubusercontent.com/vul-ai/schemas/main/threat-patterns.schema.json",
+  "version": "1.0.0",
+  "description": "架构模式到威胁的映射规则库",
+  "architectures": {
+    "mvc": {
+      "name": "MVC Architecture",
+      "description": "Model-View-Controller 架构模式",
+      "indicators": [
+        "controllers/", "models/", "views/",
+        "app/controllers", "app/models"
+      ],
+      "threats": [
+        {
+          "id": "ARCH-MVC-001",
+          "name": "Controller Parameter Injection",
+          "nameZh": "控制器参数注入",
+          "priority": "P0",
+          "description": "Controller 是主要的用户输入入口点",
+          "checkPoints": [
+            "检查所有 Controller 方法的参数",
+            "检查参数绑定和验证",
+            "检查 Model 绑定的字段过滤"
+          ]
+        },
+        {
+          "id": "ARCH-MVC-002",
+          "name": "Mass Assignment",
+          "nameZh": "批量赋值漏洞",
+          "priority": "P1",
+          "description": "Model 自动绑定可能导致字段覆盖",
+          "checkPoints": [
+            "检查 Model 的可填充字段",
+            "检查是否有字段白名单/黑名单"
+          ]
+        }
+      ]
+    },
+    "restApi": {
+      "name": "REST API",
+      "description": "RESTful API 架构",
+      "indicators": [
+        "routes/api", "/api/v1", "/api/v2",
+        "openapi", "swagger"
+      ],
+      "threats": [
+        {
+          "id": "ARCH-REST-001",
+          "name": "IDOR",
+          "nameZh": "不安全的直接对象引用",
+          "priority": "P0",
+          "description": "REST 资源路径中的 ID 参数可能导致越权",
+          "checkPoints": [
+            "检查 /resource/:id 路径的权限验证",
+            "检查资源所有权验证"
+          ]
+        },
+        {
+          "id": "ARCH-REST-002",
+          "name": "Bulk Operation Abuse",
+          "nameZh": "批量操作滥用",
+          "priority": "P1",
+          "description": "批量 API 可能被滥用",
+          "checkPoints": [
+            "检查批量创建/更新/删除的限制",
+            "检查批量操作的权限验证"
+          ]
+        },
+        {
+          "id": "ARCH-REST-003",
+          "name": "HTTP Method Override",
+          "nameZh": "HTTP方法覆盖",
+          "priority": "P1",
+          "description": "X-HTTP-Method-Override 可能绕过方法限制",
+          "checkPoints": [
+            "检查是否支持方法覆盖",
+            "检查方法覆盖的安全性"
+          ]
+        }
+      ]
+    },
+    "graphql": {
+      "name": "GraphQL API",
+      "description": "GraphQL API 架构",
+      "indicators": [
+        "/graphql", "schema.graphql", "resolvers/",
+        "typeDefs", "apollo"
+      ],
+      "threats": [
+        {
+          "id": "ARCH-GQL-001",
+          "name": "Introspection Information Disclosure",
+          "nameZh": "内省信息泄露",
+          "priority": "P1",
+          "description": "GraphQL 内省可能泄露 API 结构",
+          "checkPoints": [
+            "检查生产环境是否禁用内省",
+            "检查 __schema 查询"
+          ]
+        },
+        {
+          "id": "ARCH-GQL-002",
+          "name": "Query Depth Attack",
+          "nameZh": "查询深度攻击",
+          "priority": "P1",
+          "description": "深层嵌套查询可能导致 DoS",
+          "checkPoints": [
+            "检查查询深度限制",
+            "检查查询复杂度限制"
+          ]
+        },
+        {
+          "id": "ARCH-GQL-003",
+          "name": "Batching Attack",
+          "nameZh": "批量查询攻击",
+          "priority": "P1",
+          "description": "批量查询可能绕过限制",
+          "checkPoints": [
+            "检查批量查询限制",
+            "检查别名滥用"
+          ]
+        },
+        {
+          "id": "ARCH-GQL-004",
+          "name": "Authorization Bypass",
+          "nameZh": "授权绕过",
+          "priority": "P0",
+          "description": "Resolver 级别的权限检查可能缺失",
+          "checkPoints": [
+            "检查每个 Resolver 的权限验证",
+            "检查字段级权限"
+          ]
+        }
+      ]
+    },
+    "microservices": {
+      "name": "Microservices",
+      "description": "微服务架构",
+      "indicators": [
+        "docker-compose", "kubernetes/", "k8s/",
+        "service-mesh", "gateway/", "eureka", "consul"
+      ],
+      "threats": [
+        {
+          "id": "ARCH-MS-001",
+          "name": "Inter-service Trust",
+          "nameZh": "服务间信任问题",
+          "priority": "P0",
+          "description": "微服务间调用可能缺乏认证",
+          "checkPoints": [
+            "检查服务间调用的认证",
+            "检查 JWT 传递和验证",
+            "检查 mTLS 配置"
+          ]
+        },
+        {
+          "id": "ARCH-MS-002",
+          "name": "SSRF via Service Discovery",
+          "nameZh": "通过服务发现的SSRF",
+          "priority": "P1",
+          "description": "服务发现可能被滥用进行 SSRF",
+          "checkPoints": [
+            "检查服务注册验证",
+            "检查服务地址验证"
+          ]
+        },
+        {
+          "id": "ARCH-MS-003",
+          "name": "API Gateway Bypass",
+          "nameZh": "API网关绕过",
+          "priority": "P0",
+          "description": "直接访问后端服务绕过网关",
+          "checkPoints": [
+            "检查后端服务网络暴露",
+            "检查网关认证是否可绕过"
+          ]
+        }
+      ]
+    },
+    "rpc": {
+      "name": "RPC/gRPC",
+      "description": "RPC 远程调用架构",
+      "indicators": [
+        ".proto", "grpc", "thrift", "dubbo",
+        "rpc/", "pb.go", "_pb2.py"
+      ],
+      "threats": [
+        {
+          "id": "ARCH-RPC-001",
+          "name": "Unauthorized RPC Call",
+          "nameZh": "未授权RPC调用",
+          "priority": "P0",
+          "description": "RPC 方法可能缺乏认证",
+          "checkPoints": [
+            "检查 RPC 方法的认证",
+            "检查元数据验证"
+          ]
+        },
+        {
+          "id": "ARCH-RPC-002",
+          "name": "Parameter Injection",
+          "nameZh": "参数注入",
+          "priority": "P0",
+          "description": "RPC 参数可能存在注入风险",
+          "checkPoints": [
+            "检查参数验证",
+            "检查类型安全"
+          ]
+        },
+        {
+          "id": "ARCH-RPC-003",
+          "name": "Reflection API Exposure",
+          "nameZh": "反射API暴露",
+          "priority": "P1",
+          "description": "gRPC 反射可能泄露服务信息",
+          "checkPoints": [
+            "检查反射 API 是否启用",
+            "检查生产环境配置"
+          ]
+        }
+      ]
+    },
+    "serverless": {
+      "name": "Serverless",
+      "description": "无服务器架构",
+      "indicators": [
+        "serverless.yml", "lambda/", "functions/",
+        "firebase.json", "vercel.json", "netlify.toml"
+      ],
+      "threats": [
+        {
+          "id": "ARCH-SL-001",
+          "name": "Event Injection",
+          "nameZh": "事件注入",
+          "priority": "P0",
+          "description": "事件数据可能包含恶意内容",
+          "checkPoints": [
+            "检查事件数据验证",
+            "检查触发源信任"
+          ]
+        },
+        {
+          "id": "ARCH-SL-002",
+          "name": "Over-privileged Permissions",
+          "nameZh": "权限过宽",
+          "priority": "P1",
+          "description": "函数权限可能过宽",
+          "checkPoints": [
+            "检查 IAM 角色",
+            "检查最小权限原则"
+          ]
+        },
+        {
+          "id": "ARCH-SL-003",
+          "name": "Cold Start Attack",
+          "nameZh": "冷启动攻击",
+          "priority": "P2",
+          "description": "利用冷启动进行计时攻击",
+          "checkPoints": [
+            "检查敏感操作时间",
+            "检查预热配置"
+          ]
+        }
+      ]
+    },
+    "spa": {
+      "name": "Single Page Application",
+      "description": "单页应用架构",
+      "indicators": [
+        "react", "vue", "angular",
+        "webpack.config", "vite.config",
+        "src/App.jsx", "src/main.ts"
+      ],
+      "threats": [
+        {
+          "id": "ARCH-SPA-001",
+          "name": "XSS",
+          "nameZh": "跨站脚本",
+          "priority": "P0",
+          "description": "前端渲染可能导致 XSS",
+          "checkPoints": [
+            "检查 dangerouslySetInnerHTML",
+            "检查 v-html",
+            "检查 innerHTML 使用"
+          ]
+        },
+        {
+          "id": "ARCH-SPA-002",
+          "name": "Sensitive Data in Frontend",
+          "nameZh": "前端敏感数据",
+          "priority": "P1",
+          "description": "敏感数据可能泄露到前端",
+          "checkPoints": [
+            "检查硬编码的密钥",
+            "检查 API 响应过滤"
+          ]
+        },
+        {
+          "id": "ARCH-SPA-003",
+          "name": "Client-side Authorization",
+          "nameZh": "客户端授权",
+          "priority": "P0",
+          "description": "仅依赖前端的权限检查可被绕过",
+          "checkPoints": [
+            "检查后端是否有对应权限验证",
+            "检查路由守卫是否有后端支持"
+          ]
+        }
+      ]
+    }
+  },
+  "frameworks": {
+    "express": {
+      "name": "Express.js",
+      "threats": [
+        {
+          "id": "FW-EXPRESS-001",
+          "name": "Prototype Pollution",
+          "nameZh": "原型污染",
+          "priority": "P0",
+          "checkPoints": [
+            "检查 body-parser 配置",
+            "检查对象合并操作"
+          ]
+        },
+        {
+          "id": "FW-EXPRESS-002",
+          "name": "Middleware Bypass",
+          "nameZh": "中间件绕过",
+          "priority": "P1",
+          "checkPoints": [
+            "检查中间件顺序",
+            "检查错误处理中间件"
+          ]
+        }
+      ]
+    },
+    "springBoot": {
+      "name": "Spring Boot",
+      "threats": [
+        {
+          "id": "FW-SPRING-001",
+          "name": "SpEL Injection",
+          "nameZh": "SpEL注入",
+          "priority": "P0",
+          "checkPoints": [
+            "检查 SpEL 表达式使用",
+            "检查 @Value 注解"
+          ]
+        },
+        {
+          "id": "FW-SPRING-002",
+          "name": "Actuator Exposure",
+          "nameZh": "Actuator暴露",
+          "priority": "P1",
+          "checkPoints": [
+            "检查 actuator 端点配置",
+            "检查 /env、/heapdump 端点"
+          ]
+        }
+      ]
+    },
+    "django": {
+      "name": "Django",
+      "threats": [
+        {
+          "id": "FW-DJANGO-001",
+          "name": "ORM Injection",
+          "nameZh": "ORM注入",
+          "priority": "P0",
+          "checkPoints": [
+            "检查 extra() 和 raw() 使用",
+            "检查 QuerySet 过滤"
+          ]
+        },
+        {
+          "id": "FW-DJANGO-002",
+          "name": "Debug Mode",
+          "nameZh": "调试模式",
+          "priority": "P1",
+          "checkPoints": [
+            "检查 DEBUG 设置",
+            "检查 ALLOWED_HOSTS"
+          ]
+        }
+      ]
+    },
+    "fastapi": {
+      "name": "FastAPI",
+      "threats": [
+        {
+          "id": "FW-FASTAPI-001",
+          "name": "Pydantic Validation Bypass",
+          "nameZh": "Pydantic验证绕过",
+          "priority": "P1",
+          "checkPoints": [
+            "检查模型验证",
+            "检查 Optional 字段处理"
+          ]
+        }
+      ]
+    },
+    "laravel": {
+      "name": "Laravel",
+      "threats": [
+        {
+          "id": "FW-LARAVEL-001",
+          "name": "Deserialization",
+          "nameZh": "反序列化漏洞",
+          "priority": "P0",
+          "checkPoints": [
+            "检查 unserialize 使用",
+            "检查 cookie 加密"
+          ]
+        },
+        {
+          "id": "FW-LARAVEL-002",
+          "name": "Debug Mode",
+          "nameZh": "调试模式",
+          "priority": "P1",
+          "checkPoints": [
+            "检查 APP_DEBUG",
+            "检查错误详情暴露"
+          ]
+        }
+      ]
+    },
+    "rails": {
+      "name": "Ruby on Rails",
+      "threats": [
+        {
+          "id": "FW-RAILS-001",
+          "name": "Mass Assignment",
+          "nameZh": "批量赋值",
+          "priority": "P0",
+          "checkPoints": [
+            "检查 strong_params 使用",
+            "检查 permit 白名单"
+          ]
+        },
+        {
+          "id": "FW-RAILS-002",
+          "name": "Deserialization",
+          "nameZh": "反序列化漏洞",
+          "priority": "P0",
+          "checkPoints": [
+            "检查 YAML.load 使用",
+            "检查 Marshal.load 使用"
+          ]
+        }
+      ]
+    }
+  }
+}

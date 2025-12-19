@@ -1,0 +1,165 @@
+{
+  "$schema": "https://raw.githubusercontent.com/vul-ai/schemas/main/blackboard.schema.json",
+  "version": "1.0.0",
+  "meta": {
+    "projectName": "",
+    "projectPath": "",
+    "startedAt": "",
+    "lastUpdatedAt": "",
+    "status": "initializing",
+    "currentPhase": 0,
+    "totalPhases": 5,
+    "config": {
+      "autoConfirm": false,
+      "skipValidation": false,
+      "priorityFilter": ["P0", "P1", "P2"],
+      "maxConcurrency": 3,
+      "timeout": {
+        "perTask": 300000,
+        "total": 3600000
+      },
+      "reportFormats": ["markdown", "json"],
+      "notifyOnCritical": true
+    }
+  },
+  "phases": {
+    "engineering": {
+      "id": 1,
+      "name": "Engineering Profiling",
+      "nameZh": "工程理解",
+      "status": "pending",
+      "startedAt": null,
+      "completedAt": null,
+      "agent": "engineering-profiler",
+      "input": {
+        "projectPath": ""
+      },
+      "output": {
+        "profilePath": null,
+        "wikiPath": null,
+        "summary": {
+          "endpointCount": 0,
+          "assetCount": 0,
+          "configFileCount": 0,
+          "techStack": []
+        }
+      },
+      "errors": []
+    },
+    "threatModeling": {
+      "id": 2,
+      "name": "Threat Modeling",
+      "nameZh": "威胁建模",
+      "status": "pending",
+      "startedAt": null,
+      "completedAt": null,
+      "agent": "threat-modeler",
+      "input": {
+        "profilePath": null
+      },
+      "output": {
+        "threatModelPath": null,
+        "taskListPath": null,
+        "summary": {
+          "totalThreats": 0,
+          "p0Count": 0,
+          "p1Count": 0,
+          "p2Count": 0,
+          "topThreats": []
+        }
+      },
+      "errors": []
+    },
+    "vulnDetection": {
+      "id": 3,
+      "name": "Vulnerability Detection",
+      "nameZh": "漏洞挖掘",
+      "status": "pending",
+      "startedAt": null,
+      "completedAt": null,
+      "agents": [],
+      "input": {
+        "taskListPath": null
+      },
+      "progress": {
+        "total": 0,
+        "completed": 0,
+        "inProgress": 0,
+        "failed": 0,
+        "byPriority": {
+          "P0": { "total": 0, "completed": 0 },
+          "P1": { "total": 0, "completed": 0 },
+          "P2": { "total": 0, "completed": 0 }
+        },
+        "byAgent": {}
+      },
+      "tasks": [],
+      "findings": [],
+      "errors": []
+    },
+    "validation": {
+      "id": 4,
+      "name": "Validation",
+      "nameZh": "漏洞验证",
+      "status": "pending",
+      "startedAt": null,
+      "completedAt": null,
+      "agent": "validation-agent",
+      "input": {
+        "findings": []
+      },
+      "output": {
+        "resultsPath": null,
+        "summary": {
+          "totalFindings": 0,
+          "confirmed": 0,
+          "falsePositives": 0,
+          "needsReview": 0
+        }
+      },
+      "errors": []
+    },
+    "reporting": {
+      "id": 5,
+      "name": "Reporting",
+      "nameZh": "报告生成",
+      "status": "pending",
+      "startedAt": null,
+      "completedAt": null,
+      "agent": "report-generator",
+      "input": {
+        "validatedFindings": [],
+        "formats": ["markdown", "json"]
+      },
+      "output": {
+        "reportPaths": [],
+        "summary": {
+          "criticalCount": 0,
+          "highCount": 0,
+          "mediumCount": 0,
+          "lowCount": 0
+        }
+      },
+      "errors": []
+    }
+  },
+  "artifacts": {
+    "engineeringProfile": null,
+    "deepCodeWiki": null,
+    "threatModel": null,
+    "taskList": null,
+    "findings": [],
+    "validationResults": null,
+    "finalReport": null
+  },
+  "statistics": {
+    "totalDuration": 0,
+    "phaseDurations": {},
+    "agentCalls": 0,
+    "tasksExecuted": 0,
+    "findingsCount": 0,
+    "confirmedVulns": 0
+  },
+  "errors": [],
+  "log": []
+}

@@ -1,0 +1,181 @@
+{
+  "$schema": "https://raw.githubusercontent.com/vul-ai/schemas/main/workflow-config.schema.json",
+  "version": "1.0.0",
+  "name": "Full Security Analysis",
+  "description": "完整的安全分析工作流：工程理解 → 威胁建模 → 漏洞挖掘 → 验证 → 报告",
+  "workflow": {
+    "phases": [
+      {
+        "id": "engineering",
+        "name": "Engineering Profiling",
+        "agent": "engineering-profiler",
+        "required": true,
+        "canSkip": false,
+        "timeout": 300000,
+        "retryCount": 2,
+        "inputs": ["projectPath"],
+        "outputs": ["engineering-profile.json", "deep-code-wiki.md"],
+        "successCriteria": {
+          "outputExists": ["engineering-profile.json"],
+          "minEndpoints": 1
+        },
+        "onSuccess": "threatModeling",
+        "onFailure": "askUser"
+      },
+      {
+        "id": "threatModeling",
+        "name": "Threat Modeling",
+        "agent": "threat-modeler",
+        "required": true,
+        "canSkip": false,
+        "timeout": 180000,
+        "retryCount": 1,
+        "inputs": ["engineering-profile.json"],
+        "outputs": ["threat-model.json", "threat-task-list.json"],
+        "successCriteria": {
+          "outputExists": ["threat-task-list.json"]
+        },
+        "onSuccess": "vulnDetection",
+        "onFailure": "askUser",
+        "userCheckpoint": {
+          "enabled": true,
+          "message": "威胁建模完成，发现 {{totalThreats}} 个潜在威胁（P0: {{p0Count}}）。是否继续漏洞挖掘？",
+          "options": ["继续", "只检测P0", "停止"]
+        }
+      },
+      {
+        "id": "vulnDetection",
+        "name": "Vulnerability Detection",
+        "agent": "dynamic",
+        "required": true,
+        "canSkip": false,
+        "timeout": 1800000,
+        "parallelExecution": true,
+        "maxConcurrency": 5,
+        "inputs": ["threat-task-list.json"],
+        "outputs": ["findings/*.json"],
+        "agentMapping": {
+          "sqli": "sqli-agent",
+          "nosqli": "nosqli-agent",
+          "ssrf": "ssrf-agent",
+          "file-upload": "file-upload-agent",
+          "path-traversal": "path-traversal-agent",
+          "xss": "xss-agent",
+          "ssti": "ssti-agent",
+          "cmdi": "cmdi-agent",
+          "xxe": "xxe-agent",
+          "idor": "idor-agent",
+          "auth-bypass": "auth-bypass-agent",
+          "deserialization": "deserialization-agent",
+          "default": "generic-vuln-agent"
+        },
+        "priorityOrder": ["P0", "P1", "P2"],
+        "stopOnCritical": false,
+        "onSuccess": "validation",
+        "onFailure": "continueWithPartial",
+        "progressReporting": {
+          "enabled": true,
+          "interval": 30000,
+          "format": "漏洞挖掘进度: [{{progressBar}}] {{percentage}}% ({{completed}}/{{total}})"
+        }
+      },
+      {
+        "id": "validation",
+        "name": "Validation",
+        "agent": "validation-agent",
+        "required": false,
+        "canSkip": true,
+        "timeout": 600000,
+        "inputs": ["findings/*.json"],
+        "outputs": ["validation-results.json"],
+        "skipCondition": {
+          "config": "skipValidation",
+          "noFindings": true
+        },
+        "onSuccess": "reporting",
+        "onFailure": "reporting"
+      },
+      {
+        "id": "reporting",
+        "name": "Reporting",
+        "agent": "report-generator",
+        "required": true,
+        "canSkip": false,
+        "timeout": 120000,
+        "inputs": ["validation-results.json", "blackboard.json"],
+        "outputs": ["security-report.md", "security-report.json"],
+        "onSuccess": "complete",
+        "onFailure": "partialReport"
+      }
+    ],
+    "transitions": {
+      "engineering": {
+        "success": ["threatModeling"],
+        "failure": ["halt"]
+      },
+      "threatModeling": {
+        "success": ["vulnDetection"],
+        "failure": ["halt"],
+        "noThreats": ["reporting"]
+      },
+      "vulnDetection": {
+        "success": ["validation"],
+        "failure": ["validation"],
+        "noFindings": ["reporting"]
+      },
+      "validation": {
+        "success": ["reporting"],
+        "failure": ["reporting"],
+        "skipped": ["reporting"]
+      },
+      "reporting": {
+        "success": ["complete"],
+        "failure": ["partialComplete"]
+      }
+    }
+  },
+  "agentConfig": {
+    "engineering-profiler": {
+      "outputDir": "workspace/{targetName}",
+      "generateWiki": true
+    },
+    "threat-modeler": {
+      "knowledgeBase": ".claude/knowledge/threat-patterns",
+      "minConfidence": "medium"
+    },
+    "vulnAgents": {
+      "evidenceCollection": true,
+      "maxDepth": 3,
+      "followImports": true
+    },
+    "validation-agent": {
+      "validationLevel": "standard",
+      "falsePositiveThreshold": 0.3
+    },
+    "report-generator": {
+      "includeEvidence": true,
+      "includeRemediation": true,
+      "executiveSummary": true
+    }
+  },
+  "notifications": {
+    "onCriticalFinding": {
+      "enabled": true,
+      "message": "发现高危漏洞: {{vulnType}} at {{target}}"
+    },
+    "onPhaseComplete": {
+      "enabled": true,
+      "message": "阶段 {{phaseName}} 完成"
+    },
+    "onError": {
+      "enabled": true,
+      "message": "错误: {{errorMessage}}"
+    }
+  },
+  "recovery": {
+    "enabled": true,
+    "checkpointInterval": 60000,
+    "maxRetries": 3,
+    "backoffMultiplier": 2
+  }
+}

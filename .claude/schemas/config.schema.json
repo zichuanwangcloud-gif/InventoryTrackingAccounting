@@ -1,0 +1,239 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://vul-ai.local/schemas/config.schema.json",
+  "title": "Security Analysis Configuration",
+  "description": "Configuration file for security-orchestrator and related agents",
+  "type": "object",
+  "properties": {
+    "orchestrator": {
+      "type": "object",
+      "description": "Orchestrator behavior configuration",
+      "properties": {
+        "autoConfirm": {
+          "type": "boolean",
+          "description": "Run in fully automatic mode without user confirmation",
+          "default": true
+        },
+        "confirmPoints": {
+          "type": "array",
+          "description": "Points where user confirmation is required (when autoConfirm=false)",
+          "items": {
+            "type": "string",
+            "enum": ["afterThreatModeling", "afterValidation"]
+          },
+          "default": []
+        },
+        "maxConcurrency": {
+          "type": "integer",
+          "description": "Maximum number of concurrent vuln-agents",
+          "minimum": 1,
+          "maximum": 10,
+          "default": 5
+        },
+        "timeout": {
+          "type": "object",
+          "description": "Timeout settings in seconds",
+          "properties": {
+            "perAgent": {
+              "type": "integer",
+              "description": "Timeout per agent execution",
+              "minimum": 60,
+              "default": 600
+            },
+            "total": {
+              "type": "integer",
+              "description": "Total analysis timeout",
+              "minimum": 300,
+              "default": 3600
+            }
+          }
+        },
+        "retryPolicy": {
+          "type": "object",
+          "description": "Retry policy for failed agents",
+          "properties": {
+            "maxRetries": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 5,
+              "default": 2
+            },
+            "retryDelay": {
+              "type": "integer",
+              "description": "Delay between retries in milliseconds",
+              "default": 5000
+            },
+            "retryableErrors": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": ["timeout", "agent_crash"]
+            }
+          }
+        }
+      }
+    },
+    "agents": {
+      "type": "object",
+      "description": "Agent configuration",
+      "properties": {
+        "enabled": {
+          "type": "array",
+          "description": "List of enabled vuln-agents",
+          "items": {
+            "type": "string",
+            "enum": [
+              "sqli-agent",
+              "xss-agent",
+              "ssrf-agent",
+              "rce-agent",
+              "sast-agent",
+              "fuzz-agent",
+              "sca-agent"
+            ]
+          },
+          "default": ["sqli-agent", "xss-agent", "ssrf-agent", "rce-agent"]
+        },
+        "disabled": {
+          "type": "array",
+          "description": "Explicitly disabled agents",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "custom": {
+          "type": "array",
+          "description": "Custom agent configurations",
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Custom agent name"
+              },
+              "path": {
+                "type": "string",
+                "description": "Path to custom agent definition"
+              },
+              "config": {
+                "type": "object",
+                "description": "Agent-specific configuration"
+              }
+            }
+          },
+          "default": []
+        },
+        "priorityFilter": {
+          "type": "array",
+          "description": "Only process tasks with these priority levels",
+          "items": {
+            "type": "string",
+            "enum": ["P0", "P1", "P2"]
+          },
+          "default": ["P0", "P1", "P2"]
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "description": "Validation agent configuration",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable validation stage",
+          "default": true
+        },
+        "pocExecution": {
+          "type": "boolean",
+          "description": "Execute PoC code for verification",
+          "default": false
+        },
+        "sandbox": {
+          "type": "string",
+          "description": "Sandbox environment for PoC execution",
+          "enum": ["none", "docker", "vm"],
+          "default": "none"
+        },
+        "verificationLevel": {
+          "type": "string",
+          "description": "Level of verification to perform",
+          "enum": ["quick", "standard", "thorough"],
+          "default": "standard"
+        },
+        "browserVerification": {
+          "type": "object",
+          "description": "Browser-based verification settings",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": false
+            },
+            "headless": {
+              "type": "boolean",
+              "default": true
+            },
+            "screenshot": {
+              "type": "boolean",
+              "default": true
+            }
+          }
+        }
+      }
+    },
+    "reporting": {
+      "type": "object",
+      "description": "Reporting configuration",
+      "properties": {
+        "formats": {
+          "type": "array",
+          "description": "Output formats to generate",
+          "items": {
+            "type": "string",
+            "enum": ["markdown", "json", "html", "sarif", "csv"]
+          },
+          "default": ["markdown", "json"]
+        },
+        "includeEvidence": {
+          "type": "boolean",
+          "description": "Include evidence details in reports",
+          "default": true
+        },
+        "includeRemediation": {
+          "type": "boolean",
+          "description": "Include remediation guidance",
+          "default": true
+        },
+        "includeTechStack": {
+          "type": "boolean",
+          "description": "Include tech stack analysis",
+          "default": true
+        },
+        "severityThreshold": {
+          "type": "string",
+          "description": "Minimum severity to include in reports",
+          "enum": ["critical", "high", "medium", "low", "info"],
+          "default": "low"
+        }
+      }
+    },
+    "notifications": {
+      "type": "object",
+      "description": "Notification settings",
+      "properties": {
+        "criticalFindingAlert": {
+          "type": "boolean",
+          "description": "Alert immediately on critical findings",
+          "default": true
+        },
+        "progressUpdates": {
+          "type": "boolean",
+          "description": "Show progress updates during analysis",
+          "default": true
+        }
+      }
+    }
+  }
+}

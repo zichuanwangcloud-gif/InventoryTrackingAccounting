@@ -1,0 +1,481 @@
+{
+  "$schema": "https://raw.githubusercontent.com/vul-ai/schemas/main/threat-patterns.schema.json",
+  "version": "1.0.0",
+  "description": "端点路径特征到威胁的映射规则库",
+  "patterns": {
+    "authentication": {
+      "pathPatterns": [
+        "/login", "/signin", "/auth", "/authenticate",
+        "/logout", "/signout",
+        "/register", "/signup", "/join",
+        "/password", "/forgot", "/reset",
+        "/oauth", "/callback", "/authorize",
+        "/token", "/refresh", "/access_token",
+        "/mfa", "/2fa", "/otp", "/verify"
+      ],
+      "threats": [
+        {
+          "id": "AUTH-001",
+          "name": "Brute Force Attack",
+          "nameZh": "暴力破解",
+          "priority": "P1",
+          "cwes": ["CWE-307"],
+          "checkPoints": [
+            "检查是否有登录频率限制",
+            "检查是否有账户锁定机制",
+            "检查是否有验证码"
+          ]
+        },
+        {
+          "id": "AUTH-002",
+          "name": "Authentication Bypass",
+          "nameZh": "认证绕过",
+          "priority": "P0",
+          "cwes": ["CWE-287"],
+          "checkPoints": [
+            "检查认证逻辑是否可绕过",
+            "检查默认凭据",
+            "检查 JWT 验证"
+          ]
+        },
+        {
+          "id": "AUTH-003",
+          "name": "User Enumeration",
+          "nameZh": "用户枚举",
+          "priority": "P2",
+          "cwes": ["CWE-204"],
+          "checkPoints": [
+            "检查错误消息是否区分用户名/密码错误",
+            "检查响应时间差异"
+          ]
+        },
+        {
+          "id": "AUTH-004",
+          "name": "SQL Injection in Auth",
+          "nameZh": "认证SQL注入",
+          "priority": "P0",
+          "cwes": ["CWE-89"],
+          "conditions": ["database_dependency"],
+          "checkPoints": [
+            "检查用户名参数是否参数化",
+            "检查密码参数是否参数化"
+          ],
+          "suggestedAgent": "sqli-agent"
+        },
+        {
+          "id": "AUTH-005",
+          "name": "Credential Stuffing",
+          "nameZh": "撞库攻击",
+          "priority": "P1",
+          "cwes": ["CWE-521"],
+          "checkPoints": [
+            "检查是否检测异常登录",
+            "检查是否支持多因素认证"
+          ]
+        },
+        {
+          "id": "AUTH-006",
+          "name": "Session Fixation",
+          "nameZh": "会话固定",
+          "priority": "P1",
+          "cwes": ["CWE-384"],
+          "checkPoints": [
+            "检查登录后是否重新生成 Session ID"
+          ]
+        },
+        {
+          "id": "AUTH-007",
+          "name": "Password Reset Vulnerability",
+          "nameZh": "密码重置漏洞",
+          "priority": "P0",
+          "cwes": ["CWE-640"],
+          "checkPoints": [
+            "检查重置令牌是否可预测",
+            "检查令牌有效期",
+            "检查令牌是否一次性"
+          ]
+        },
+        {
+          "id": "AUTH-008",
+          "name": "OAuth Misconfiguration",
+          "nameZh": "OAuth配置错误",
+          "priority": "P1",
+          "cwes": ["CWE-346"],
+          "checkPoints": [
+            "检查 redirect_uri 验证",
+            "检查 state 参数验证",
+            "检查 CSRF 防护"
+          ]
+        },
+        {
+          "id": "AUTH-009",
+          "name": "JWT Vulnerability",
+          "nameZh": "JWT漏洞",
+          "priority": "P0",
+          "cwes": ["CWE-347"],
+          "checkPoints": [
+            "检查是否接受 none 算法",
+            "检查密钥强度",
+            "检查是否验证签名"
+          ],
+          "suggestedAgent": "jwt-agent"
+        }
+      ]
+    },
+    "fileOperation": {
+      "pathPatterns": [
+        "/upload", "/file/upload", "/attach", "/attachment",
+        "/download", "/file/download", "/export",
+        "/import", "/file/import",
+        "/image", "/avatar", "/media", "/asset"
+      ],
+      "threats": [
+        {
+          "id": "FILE-001",
+          "name": "Arbitrary File Upload",
+          "nameZh": "任意文件上传",
+          "priority": "P0",
+          "cwes": ["CWE-434"],
+          "checkPoints": [
+            "检查文件扩展名白名单",
+            "检查 MIME 类型验证",
+            "检查文件内容/魔数验证",
+            "检查文件名净化",
+            "检查上传目录权限"
+          ],
+          "suggestedAgent": "file-upload-agent"
+        },
+        {
+          "id": "FILE-002",
+          "name": "Path Traversal",
+          "nameZh": "目录穿越",
+          "priority": "P0",
+          "cwes": ["CWE-22"],
+          "checkPoints": [
+            "检查文件名是否包含 ../",
+            "检查是否使用绝对路径",
+            "检查路径规范化"
+          ],
+          "suggestedAgent": "path-traversal-agent"
+        },
+        {
+          "id": "FILE-003",
+          "name": "XSS via File Upload",
+          "nameZh": "通过文件上传的XSS",
+          "priority": "P1",
+          "cwes": ["CWE-79"],
+          "checkPoints": [
+            "检查 SVG 文件处理",
+            "检查 HTML 文件处理",
+            "检查 Content-Type 头设置"
+          ]
+        },
+        {
+          "id": "FILE-004",
+          "name": "Sensitive File Disclosure",
+          "nameZh": "敏感文件泄露",
+          "priority": "P0",
+          "cwes": ["CWE-538"],
+          "checkPoints": [
+            "检查是否可下载任意文件",
+            "检查文件访问权限验证"
+          ]
+        },
+        {
+          "id": "FILE-005",
+          "name": "XXE via File Upload",
+          "nameZh": "通过文件上传的XXE",
+          "priority": "P0",
+          "cwes": ["CWE-611"],
+          "conditions": ["accepts_xml", "accepts_docx", "accepts_svg"],
+          "checkPoints": [
+            "检查 XML 文件解析配置",
+            "检查是否禁用外部实体"
+          ],
+          "suggestedAgent": "xxe-agent"
+        }
+      ]
+    },
+    "dataOperation": {
+      "pathPatterns": [
+        "/search", "/query", "/find", "/filter",
+        "/list", "/get", "/view", "/detail", "/show",
+        "/create", "/add", "/new", "/insert",
+        "/update", "/edit", "/modify", "/patch",
+        "/delete", "/remove", "/destroy"
+      ],
+      "threats": [
+        {
+          "id": "DATA-001",
+          "name": "SQL Injection",
+          "nameZh": "SQL注入",
+          "priority": "P0",
+          "cwes": ["CWE-89"],
+          "conditions": ["database_dependency"],
+          "checkPoints": [
+            "检查查询参数是否参数化",
+            "检查排序字段是否可控",
+            "检查分页参数"
+          ],
+          "suggestedAgent": "sqli-agent"
+        },
+        {
+          "id": "DATA-002",
+          "name": "NoSQL Injection",
+          "nameZh": "NoSQL注入",
+          "priority": "P0",
+          "cwes": ["CWE-943"],
+          "conditions": ["mongodb_dependency", "nosql_dependency"],
+          "checkPoints": [
+            "检查 MongoDB 查询构造",
+            "检查 JSON 参数处理"
+          ],
+          "suggestedAgent": "nosqli-agent"
+        },
+        {
+          "id": "DATA-003",
+          "name": "IDOR",
+          "nameZh": "不安全的直接对象引用",
+          "priority": "P0",
+          "cwes": ["CWE-639"],
+          "checkPoints": [
+            "检查资源 ID 是否可预测",
+            "检查是否验证资源所有权",
+            "检查是否有访问控制"
+          ],
+          "suggestedAgent": "idor-agent"
+        },
+        {
+          "id": "DATA-004",
+          "name": "Mass Assignment",
+          "nameZh": "批量赋值",
+          "priority": "P1",
+          "cwes": ["CWE-915"],
+          "checkPoints": [
+            "检查是否有字段白名单",
+            "检查敏感字段是否可修改（role, isAdmin）"
+          ],
+          "suggestedAgent": "mass-assignment-agent"
+        },
+        {
+          "id": "DATA-005",
+          "name": "Information Disclosure",
+          "nameZh": "信息泄露",
+          "priority": "P2",
+          "cwes": ["CWE-200"],
+          "checkPoints": [
+            "检查错误消息是否包含敏感信息",
+            "检查是否返回过多字段"
+          ]
+        }
+      ]
+    },
+    "proxy": {
+      "pathPatterns": [
+        "/proxy", "/fetch", "/curl", "/request",
+        "/redirect", "/goto", "/url", "/link",
+        "/webhook", "/callback", "/hook",
+        "/api/external", "/remote"
+      ],
+      "threats": [
+        {
+          "id": "PROXY-001",
+          "name": "SSRF",
+          "nameZh": "服务端请求伪造",
+          "priority": "P0",
+          "cwes": ["CWE-918"],
+          "checkPoints": [
+            "检查 URL 参数是否可控",
+            "检查是否有 URL 白名单",
+            "检查是否可访问内网地址",
+            "检查是否可使用其他协议（file://、gopher://）"
+          ],
+          "suggestedAgent": "ssrf-agent"
+        },
+        {
+          "id": "PROXY-002",
+          "name": "Open Redirect",
+          "nameZh": "开放重定向",
+          "priority": "P1",
+          "cwes": ["CWE-601"],
+          "checkPoints": [
+            "检查重定向 URL 是否验证",
+            "检查是否只允许同域重定向"
+          ],
+          "suggestedAgent": "open-redirect-agent"
+        },
+        {
+          "id": "PROXY-003",
+          "name": "Local File Inclusion",
+          "nameZh": "本地文件包含",
+          "priority": "P0",
+          "cwes": ["CWE-98"],
+          "checkPoints": [
+            "检查是否可使用 file:// 协议",
+            "检查路径穿越"
+          ]
+        }
+      ]
+    },
+    "template": {
+      "pathPatterns": [
+        "/render", "/template", "/preview",
+        "/pdf", "/report", "/generate",
+        "/email", "/mail", "/notify", "/send"
+      ],
+      "threats": [
+        {
+          "id": "TPL-001",
+          "name": "SSTI",
+          "nameZh": "服务端模板注入",
+          "priority": "P0",
+          "cwes": ["CWE-1336"],
+          "checkPoints": [
+            "检查用户输入是否进入模板",
+            "检查模板引擎类型",
+            "测试 {{7*7}} 等 payload"
+          ],
+          "suggestedAgent": "ssti-agent"
+        },
+        {
+          "id": "TPL-002",
+          "name": "Email Injection",
+          "nameZh": "邮件注入",
+          "priority": "P1",
+          "cwes": ["CWE-93"],
+          "checkPoints": [
+            "检查收件人是否可控",
+            "检查邮件头是否可注入"
+          ]
+        }
+      ]
+    },
+    "execution": {
+      "pathPatterns": [
+        "/exec", "/run", "/execute", "/command",
+        "/eval", "/script", "/code",
+        "/shell", "/terminal", "/console",
+        "/cron", "/schedule", "/job", "/task"
+      ],
+      "threats": [
+        {
+          "id": "EXEC-001",
+          "name": "Command Injection",
+          "nameZh": "命令注入",
+          "priority": "P0",
+          "cwes": ["CWE-78"],
+          "checkPoints": [
+            "检查是否直接拼接命令",
+            "检查是否使用 shell=True",
+            "检查特殊字符过滤"
+          ],
+          "suggestedAgent": "cmdi-agent"
+        },
+        {
+          "id": "EXEC-002",
+          "name": "Code Injection",
+          "nameZh": "代码注入",
+          "priority": "P0",
+          "cwes": ["CWE-94"],
+          "checkPoints": [
+            "检查是否使用 eval()",
+            "检查是否使用动态代码执行"
+          ],
+          "suggestedAgent": "code-injection-agent"
+        }
+      ]
+    },
+    "serialization": {
+      "pathPatterns": [
+        "/deserialize", "/unmarshal", "/decode",
+        "/xml", "/soap", "/wsdl",
+        "/graphql", "/gql"
+      ],
+      "threats": [
+        {
+          "id": "SER-001",
+          "name": "Insecure Deserialization",
+          "nameZh": "不安全的反序列化",
+          "priority": "P0",
+          "cwes": ["CWE-502"],
+          "checkPoints": [
+            "检查是否反序列化用户输入",
+            "检查反序列化类型限制"
+          ],
+          "suggestedAgent": "deserialization-agent"
+        },
+        {
+          "id": "SER-002",
+          "name": "XXE",
+          "nameZh": "XML外部实体注入",
+          "priority": "P0",
+          "cwes": ["CWE-611"],
+          "checkPoints": [
+            "检查 XML 解析器配置",
+            "检查是否禁用 DTD",
+            "检查是否禁用外部实体"
+          ],
+          "suggestedAgent": "xxe-agent"
+        },
+        {
+          "id": "SER-003",
+          "name": "GraphQL Vulnerabilities",
+          "nameZh": "GraphQL漏洞",
+          "priority": "P1",
+          "cwes": ["CWE-400", "CWE-200"],
+          "checkPoints": [
+            "检查查询深度限制",
+            "检查 introspection 是否开启",
+            "检查批量查询限制"
+          ],
+          "suggestedAgent": "graphql-agent"
+        }
+      ]
+    },
+    "admin": {
+      "pathPatterns": [
+        "/admin", "/manage", "/manager", "/backend",
+        "/dashboard", "/system", "/config", "/setting",
+        "/actuator", "/metrics", "/health", "/debug"
+      ],
+      "threats": [
+        {
+          "id": "ADMIN-001",
+          "name": "Unauthorized Access",
+          "nameZh": "未授权访问",
+          "priority": "P0",
+          "cwes": ["CWE-284"],
+          "checkPoints": [
+            "检查是否需要认证",
+            "检查是否有权限验证",
+            "检查默认凭据"
+          ],
+          "suggestedAgent": "access-control-agent"
+        },
+        {
+          "id": "ADMIN-002",
+          "name": "Privilege Escalation",
+          "nameZh": "权限提升",
+          "priority": "P0",
+          "cwes": ["CWE-269"],
+          "checkPoints": [
+            "检查角色验证",
+            "检查垂直越权"
+          ]
+        },
+        {
+          "id": "ADMIN-003",
+          "name": "Sensitive Endpoint Exposure",
+          "nameZh": "敏感端点暴露",
+          "priority": "P1",
+          "cwes": ["CWE-200"],
+          "checkPoints": [
+            "检查 actuator 端点",
+            "检查调试接口",
+            "检查配置接口"
+          ]
+        }
+      ]
+    }
+  }
+}

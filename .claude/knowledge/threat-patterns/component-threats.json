@@ -1,0 +1,387 @@
+{
+  "$schema": "https://raw.githubusercontent.com/vul-ai/schemas/main/threat-patterns.schema.json",
+  "version": "1.0.0",
+  "description": "组件/资产到威胁的映射规则库",
+  "components": {
+    "databases": {
+      "mysql": {
+        "name": "MySQL",
+        "threats": [
+          {
+            "id": "DB-MYSQL-001",
+            "name": "SQL Injection",
+            "nameZh": "SQL注入",
+            "priority": "P0",
+            "cwes": ["CWE-89"],
+            "checkPoints": [
+              "检查所有 SQL 查询是否使用参数化",
+              "检查 ORM 是否有 raw query",
+              "检查动态表名/列名"
+            ]
+          },
+          {
+            "id": "DB-MYSQL-002",
+            "name": "Data Exposure",
+            "nameZh": "数据泄露",
+            "priority": "P1",
+            "cwes": ["CWE-200"],
+            "checkPoints": [
+              "检查敏感数据是否加密存储",
+              "检查查询是否返回过多字段"
+            ]
+          },
+          {
+            "id": "DB-MYSQL-003",
+            "name": "Privilege Escalation",
+            "nameZh": "数据库权限提升",
+            "priority": "P1",
+            "cwes": ["CWE-269"],
+            "checkPoints": [
+              "检查数据库用户权限",
+              "检查是否使用 root 账户"
+            ]
+          }
+        ]
+      },
+      "postgresql": {
+        "name": "PostgreSQL",
+        "threats": [
+          {
+            "id": "DB-PG-001",
+            "name": "SQL Injection",
+            "nameZh": "SQL注入",
+            "priority": "P0",
+            "cwes": ["CWE-89"],
+            "checkPoints": [
+              "检查所有 SQL 查询是否使用参数化",
+              "检查 COPY 命令使用"
+            ]
+          },
+          {
+            "id": "DB-PG-002",
+            "name": "Large Object Abuse",
+            "nameZh": "大对象滥用",
+            "priority": "P1",
+            "cwes": ["CWE-434"],
+            "checkPoints": [
+              "检查 lo_import/lo_export 使用"
+            ]
+          }
+        ]
+      },
+      "mongodb": {
+        "name": "MongoDB",
+        "threats": [
+          {
+            "id": "DB-MONGO-001",
+            "name": "NoSQL Injection",
+            "nameZh": "NoSQL注入",
+            "priority": "P0",
+            "cwes": ["CWE-943"],
+            "checkPoints": [
+              "检查查询是否使用用户输入构造",
+              "检查 $where 子句",
+              "检查 JSON 操作符注入"
+            ]
+          },
+          {
+            "id": "DB-MONGO-002",
+            "name": "Unauthorized Access",
+            "nameZh": "未授权访问",
+            "priority": "P0",
+            "cwes": ["CWE-284"],
+            "checkPoints": [
+              "检查是否启用认证",
+              "检查是否绑定 0.0.0.0"
+            ]
+          }
+        ]
+      },
+      "redis": {
+        "name": "Redis",
+        "threats": [
+          {
+            "id": "CACHE-REDIS-001",
+            "name": "Unauthorized Access",
+            "nameZh": "未授权访问",
+            "priority": "P0",
+            "cwes": ["CWE-284"],
+            "checkPoints": [
+              "检查是否设置密码",
+              "检查是否绑定本地",
+              "检查是否开启保护模式"
+            ]
+          },
+          {
+            "id": "CACHE-REDIS-002",
+            "name": "Cache Poisoning",
+            "nameZh": "缓存投毒",
+            "priority": "P1",
+            "cwes": ["CWE-349"],
+            "checkPoints": [
+              "检查缓存键是否可控",
+              "检查缓存数据验证"
+            ]
+          },
+          {
+            "id": "CACHE-REDIS-003",
+            "name": "SSRF via Redis",
+            "nameZh": "通过Redis的SSRF",
+            "priority": "P1",
+            "cwes": ["CWE-918"],
+            "checkPoints": [
+              "检查是否可通过 SSRF 访问 Redis",
+              "检查 Redis 协议利用"
+            ]
+          },
+          {
+            "id": "CACHE-REDIS-004",
+            "name": "Lua Script Injection",
+            "nameZh": "Lua脚本注入",
+            "priority": "P0",
+            "cwes": ["CWE-94"],
+            "checkPoints": [
+              "检查 EVAL 命令使用",
+              "检查 Lua 脚本参数"
+            ]
+          }
+        ]
+      },
+      "elasticsearch": {
+        "name": "Elasticsearch",
+        "threats": [
+          {
+            "id": "SEARCH-ES-001",
+            "name": "Unauthorized Access",
+            "nameZh": "未授权访问",
+            "priority": "P0",
+            "cwes": ["CWE-284"],
+            "checkPoints": [
+              "检查是否启用认证",
+              "检查网络暴露"
+            ]
+          },
+          {
+            "id": "SEARCH-ES-002",
+            "name": "Query Injection",
+            "nameZh": "查询注入",
+            "priority": "P1",
+            "cwes": ["CWE-943"],
+            "checkPoints": [
+              "检查查询 DSL 构造",
+              "检查脚本查询"
+            ]
+          },
+          {
+            "id": "SEARCH-ES-003",
+            "name": "Information Disclosure",
+            "nameZh": "信息泄露",
+            "priority": "P1",
+            "cwes": ["CWE-200"],
+            "checkPoints": [
+              "检查索引访问控制",
+              "检查是否可枚举索引"
+            ]
+          }
+        ]
+      }
+    },
+    "messageQueues": {
+      "rabbitmq": {
+        "name": "RabbitMQ",
+        "threats": [
+          {
+            "id": "MQ-RABBIT-001",
+            "name": "Unauthorized Access",
+            "nameZh": "未授权访问",
+            "priority": "P1",
+            "cwes": ["CWE-284"],
+            "checkPoints": [
+              "检查默认凭据",
+              "检查管理界面暴露"
+            ]
+          },
+          {
+            "id": "MQ-RABBIT-002",
+            "name": "Message Injection",
+            "nameZh": "消息注入",
+            "priority": "P1",
+            "cwes": ["CWE-94"],
+            "checkPoints": [
+              "检查消息来源验证",
+              "检查消息内容验证"
+            ]
+          }
+        ]
+      },
+      "kafka": {
+        "name": "Kafka",
+        "threats": [
+          {
+            "id": "MQ-KAFKA-001",
+            "name": "Unauthorized Access",
+            "nameZh": "未授权访问",
+            "priority": "P1",
+            "cwes": ["CWE-284"],
+            "checkPoints": [
+              "检查 ACL 配置",
+              "检查认证配置"
+            ]
+          },
+          {
+            "id": "MQ-KAFKA-002",
+            "name": "Data Exposure",
+            "nameZh": "数据泄露",
+            "priority": "P1",
+            "cwes": ["CWE-200"],
+            "checkPoints": [
+              "检查 topic 访问控制",
+              "检查敏感数据加密"
+            ]
+          }
+        ]
+      }
+    },
+    "cloudServices": {
+      "s3": {
+        "name": "AWS S3 / OSS",
+        "threats": [
+          {
+            "id": "CLOUD-S3-001",
+            "name": "Public Bucket",
+            "nameZh": "公开Bucket",
+            "priority": "P0",
+            "cwes": ["CWE-284"],
+            "checkPoints": [
+              "检查 Bucket ACL",
+              "检查 Bucket Policy",
+              "检查是否开启公开访问"
+            ]
+          },
+          {
+            "id": "CLOUD-S3-002",
+            "name": "Insecure Direct Object Reference",
+            "nameZh": "不安全的对象引用",
+            "priority": "P1",
+            "cwes": ["CWE-639"],
+            "checkPoints": [
+              "检查对象键是否可预测",
+              "检查预签名 URL 有效期"
+            ]
+          }
+        ]
+      },
+      "lambda": {
+        "name": "AWS Lambda / Serverless",
+        "threats": [
+          {
+            "id": "CLOUD-LAMBDA-001",
+            "name": "Over-privileged IAM Role",
+            "nameZh": "IAM权限过宽",
+            "priority": "P1",
+            "cwes": ["CWE-269"],
+            "checkPoints": [
+              "检查 IAM 角色权限",
+              "检查最小权限原则"
+            ]
+          },
+          {
+            "id": "CLOUD-LAMBDA-002",
+            "name": "Event Injection",
+            "nameZh": "事件注入",
+            "priority": "P0",
+            "cwes": ["CWE-94"],
+            "checkPoints": [
+              "检查事件数据验证",
+              "检查触发源信任"
+            ]
+          }
+        ]
+      }
+    },
+    "externalAPIs": {
+      "payment": {
+        "name": "Payment Gateway",
+        "threats": [
+          {
+            "id": "EXT-PAY-001",
+            "name": "Payment Bypass",
+            "nameZh": "支付绕过",
+            "priority": "P0",
+            "cwes": ["CWE-840"],
+            "checkPoints": [
+              "检查金额是否服务端验证",
+              "检查回调签名验证",
+              "检查订单状态机"
+            ]
+          },
+          {
+            "id": "EXT-PAY-002",
+            "name": "Race Condition",
+            "nameZh": "竞态条件",
+            "priority": "P0",
+            "cwes": ["CWE-362"],
+            "checkPoints": [
+              "检查并发支付处理",
+              "检查库存扣减原子性"
+            ]
+          }
+        ]
+      },
+      "oauth": {
+        "name": "OAuth Provider",
+        "threats": [
+          {
+            "id": "EXT-OAUTH-001",
+            "name": "Token Leakage",
+            "nameZh": "令牌泄露",
+            "priority": "P0",
+            "cwes": ["CWE-522"],
+            "checkPoints": [
+              "检查令牌存储方式",
+              "检查令牌传输安全"
+            ]
+          },
+          {
+            "id": "EXT-OAUTH-002",
+            "name": "Authorization Bypass",
+            "nameZh": "授权绕过",
+            "priority": "P0",
+            "cwes": ["CWE-287"],
+            "checkPoints": [
+              "检查 scope 验证",
+              "检查 state 参数"
+            ]
+          }
+        ]
+      },
+      "smtp": {
+        "name": "SMTP Service",
+        "threats": [
+          {
+            "id": "EXT-SMTP-001",
+            "name": "Email Spoofing",
+            "nameZh": "邮件伪造",
+            "priority": "P2",
+            "cwes": ["CWE-290"],
+            "checkPoints": [
+              "检查发件人验证",
+              "检查 SPF/DKIM/DMARC"
+            ]
+          },
+          {
+            "id": "EXT-SMTP-002",
+            "name": "Email Header Injection",
+            "nameZh": "邮件头注入",
+            "priority": "P1",
+            "cwes": ["CWE-93"],
+            "checkPoints": [
+              "检查收件人是否可控",
+              "检查主题是否可注入"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
