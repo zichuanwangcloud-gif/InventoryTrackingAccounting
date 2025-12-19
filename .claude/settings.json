@@ -1,0 +1,47 @@
+{
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "sequential-thinking",
+    "playwright"
+  ],
+  "permissions": {
+    "allow": [
+      "*"
+    ],
+    "defaultMode": "acceptEdits"
+  },
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/skill-activation-prompt.py"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/semgrep-execution-guard.py"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|MultiEdit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/post-tool-use-tracker.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

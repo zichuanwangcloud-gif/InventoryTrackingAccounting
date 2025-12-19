@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Assessment Report - {{PROJECT_NAME}}</title>
+    <style>
+        :root {
+            --color-critical: #dc2626;
+            --color-high: #ea580c;
+            --color-medium: #d97706;
+            --color-low: #65a30d;
+            --color-info: #0284c7;
+            --color-bg: #f8fafc;
+            --color-card: #ffffff;
+            --color-border: #e2e8f0;
+            --color-text: #1e293b;
+            --color-text-secondary: #64748b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header-meta {
+            display: flex;
+            gap: 2rem;
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+
+        /* Grade Badge */
+        .grade-section {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .grade-badge {
+            background: var(--color-card);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            flex: 0 0 200px;
+        }
+
+        .grade-letter {
+            font-size: 4rem;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .grade-A { color: #16a34a; }
+        .grade-B { color: #65a30d; }
+        .grade-C { color: #d97706; }
+        .grade-D { color: #ea580c; }
+        .grade-F { color: #dc2626; }
+
+        .grade-label {
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            flex: 1;
+        }
+
+        .stat-card {
+            background: var(--color-card);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-critical .stat-value { color: var(--color-critical); }
+        .stat-high .stat-value { color: var(--color-high); }
+        .stat-medium .stat-value { color: var(--color-medium); }
+        .stat-low .stat-value { color: var(--color-low); }
+        .stat-info .stat-value { color: var(--color-info); }
+
+        /* Cards */
+        .card {
+            background: var(--color-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        th {
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--color-text-secondary);
+        }
+
+        tr:hover {
+            background-color: #f8fafc;
+        }
+
+        /* Severity Badges */
+        .severity-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .severity-critical {
+            background-color: #fef2f2;
+            color: var(--color-critical);
+        }
+
+        .severity-high {
+            background-color: #fff7ed;
+            color: var(--color-high);
+        }
+
+        .severity-medium {
+            background-color: #fffbeb;
+            color: var(--color-medium);
+        }
+
+        .severity-low {
+            background-color: #f7fee7;
+            color: var(--color-low);
+        }
+
+        .severity-info {
+            background-color: #f0f9ff;
+            color: var(--color-info);
+        }
+
+        /* Priority Badges */
+        .priority-badge {
+            display: inline-block;
+            padding: 0.125rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .priority-p0 {
+            background-color: var(--color-critical);
+            color: white;
+        }
+
+        .priority-p1 {
+            background-color: var(--color-high);
+            color: white;
+        }
+
+        .priority-p2 {
+            background-color: var(--color-medium);
+            color: white;
+        }
+
+        .priority-p3 {
+            background-color: var(--color-low);
+            color: white;
+        }
+
+        /* Vulnerability List */
+        .vuln-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--color-border);
+            gap: 1rem;
+        }
+
+        .vuln-item:last-child {
+            border-bottom: none;
+        }
+
+        .vuln-item:hover {
+            background-color: #f8fafc;
+        }
+
+        .vuln-id {
+            font-family: monospace;
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+            min-width: 120px;
+        }
+
+        .vuln-title {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .vuln-location {
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: var(--color-text-secondary);
+        }
+
+        /* Attack Path */
+        .attack-path {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .attack-path-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .attack-path-steps {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .attack-step {
+            background: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            border: 1px solid var(--color-border);
+        }
+
+        .attack-arrow {
+            color: var(--color-text-secondary);
+        }
+
+        /* Charts placeholder */
+        .chart-placeholder {
+            height: 200px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-text-secondary);
+        }
+
+        /* Recommendations */
+        .recommendation-list {
+            list-style: none;
+        }
+
+        .recommendation-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .recommendation-item:last-child {
+            border-bottom: none;
+        }
+
+        .recommendation-icon {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+
+        .recommendation-immediate .recommendation-icon {
+            background: #fef2f2;
+            color: var(--color-critical);
+        }
+
+        .recommendation-shortterm .recommendation-icon {
+            background: #fff7ed;
+            color: var(--color-high);
+        }
+
+        .recommendation-longterm .recommendation-icon {
+            background: #f0f9ff;
+            color: var(--color-info);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--color-text-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+            }
+
+            .container {
+                max-width: none;
+                padding: 0;
+            }
+
+            .card {
+                box-shadow: none;
+                border: 1px solid var(--color-border);
+            }
+
+            .header {
+                background: #1e3a5f;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .grade-section {
+                flex-direction: column;
+            }
+
+            .grade-badge {
+                flex: none;
+            }
+
+            .header-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>Security Assessment Report</h1>
+            <p style="font-size: 1.25rem; margin-bottom: 1rem;">{{PROJECT_NAME}}</p>
+            <div class="header-meta">
+                <span>Version: {{PROJECT_VERSION}}</span>
+                <span>Report ID: {{REPORT_ID}}</span>
+                <span>Date: {{ASSESSMENT_DATE}}</span>
+            </div>
+        </header>
+
+        <!-- Grade and Stats -->
+        <section class="grade-section">
+            <div class="grade-badge">
+                <div class="grade-letter grade-{{SECURITY_GRADE}}">{{SECURITY_GRADE}}</div>
+                <div class="grade-label">Security Grade</div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card stat-critical">
+                    <div class="stat-value">{{CRITICAL_COUNT}}</div>
+                    <div class="stat-label">Critical</div>
+                </div>
+                <div class="stat-card stat-high">
+                    <div class="stat-value">{{HIGH_COUNT}}</div>
+                    <div class="stat-label">High</div>
+                </div>
+                <div class="stat-card stat-medium">
+                    <div class="stat-value">{{MEDIUM_COUNT}}</div>
+                    <div class="stat-label">Medium</div>
+                </div>
+                <div class="stat-card stat-low">
+                    <div class="stat-value">{{LOW_COUNT}}</div>
+                    <div class="stat-label">Low</div>
+                </div>
+                <div class="stat-card stat-info">
+                    <div class="stat-value">{{INFO_COUNT}}</div>
+                    <div class="stat-label">Info</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Vulnerability Distribution Chart -->
+        <section class="card">
+            <div class="card-header">
+                <h2 class="card-title">Vulnerability Distribution</h2>
+            </div>
+            <div class="chart-placeholder">
+                [Category Distribution Chart - {{TOTAL_COUNT}} vulnerabilities]
+            </div>
+        </section>
+
+        <!-- Top Vulnerabilities -->
+        <section class="card">
+            <div class="card-header">
+                <h2 class="card-title">Critical & High Vulnerabilities</h2>
+                <span class="severity-badge severity-critical">Requires Immediate Attention</span>
+            </div>
+            <div class="vuln-list">
+                {{#CRITICAL_HIGH_VULNS}}
+                <div class="vuln-item">
+                    <span class="vuln-id">{{VULN_ID}}</span>
+                    <span class="severity-badge severity-{{SEVERITY}}">{{SEVERITY}}</span>
+                    <span class="vuln-title">{{VULN_TITLE}}</span>
+                    <span class="priority-badge priority-{{PRIORITY}}">{{PRIORITY}}</span>
+                    <span class="vuln-location">{{VULN_LOCATION}}</span>
+                </div>
+                {{/CRITICAL_HIGH_VULNS}}
+            </div>
+        </section>
+
+        <!-- Attack Paths -->
+        <section class="card">
+            <div class="card-header">
+                <h2 class="card-title">Potential Attack Paths</h2>
+            </div>
+            {{#ATTACK_PATHS}}
+            <div class="attack-path">
+                <div class="attack-path-header">
+                    <span class="severity-badge severity-{{PATH_RISK}}">{{PATH_RISK}}</span>
+                    <strong>{{PATH_NAME}}</strong>
+                </div>
+                <div class="attack-path-steps">
+                    {{#PATH_STEPS}}
+                    <span class="attack-step">{{STEP}}</span>
+                    <span class="attack-arrow">→</span>
+                    {{/PATH_STEPS}}
+                </div>
+            </div>
+            {{/ATTACK_PATHS}}
+        </section>
+
+        <!-- All Vulnerabilities Table -->
+        <section class="card">
+            <div class="card-header">
+                <h2 class="card-title">All Vulnerabilities</h2>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Severity</th>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Location</th>
+                        <th>Priority</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#ALL_VULNS}}
+                    <tr>
+                        <td><code>{{VULN_ID}}</code></td>
+                        <td><span class="severity-badge severity-{{SEVERITY}}">{{SEVERITY}}</span></td>
+                        <td>{{VULN_TITLE}}</td>
+                        <td>{{CATEGORY}}</td>
+                        <td><code>{{VULN_LOCATION}}</code></td>
+                        <td><span class="priority-badge priority-{{PRIORITY}}">{{PRIORITY}}</span></td>
+                    </tr>
+                    {{/ALL_VULNS}}
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Module Risk Heatmap -->
+        <section class="card">
+            <div class="card-header">
+                <h2 class="card-title">Module Risk Heatmap</h2>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Module</th>
+                        <th>Critical</th>
+                        <th>High</th>
+                        <th>Medium</th>
+                        <th>Low</th>
+                        <th>Risk Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#MODULES}}
+                    <tr>
+                        <td><code>{{MODULE_NAME}}</code></td>
+                        <td>{{M_CRITICAL}}</td>
+                        <td>{{M_HIGH}}</td>
+                        <td>{{M_MEDIUM}}</td>
+                        <td>{{M_LOW}}</td>
+                        <td><strong>{{M_SCORE}}</strong></td>
+                    </tr>
+                    {{/MODULES}}
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Recommendations -->
+        <section class="card">
+            <div class="card-header">
+                <h2 class="card-title">Recommendations</h2>
+            </div>
+
+            <h3 style="font-size: 0.875rem; margin: 1rem 0 0.5rem; color: var(--color-critical);">Immediate Actions (24 hours)</h3>
+            <ul class="recommendation-list">
+                {{#IMMEDIATE_ACTIONS}}
+                <li class="recommendation-item recommendation-immediate">
+                    <span class="recommendation-icon">!</span>
+                    <span>{{ACTION}}</span>
+                </li>
+                {{/IMMEDIATE_ACTIONS}}
+            </ul>
+
+            <h3 style="font-size: 0.875rem; margin: 1rem 0 0.5rem; color: var(--color-high);">Short-term (This Quarter)</h3>
+            <ul class="recommendation-list">
+                {{#SHORTTERM_ACTIONS}}
+                <li class="recommendation-item recommendation-shortterm">
+                    <span class="recommendation-icon">→</span>
+                    <span>{{ACTION}}</span>
+                </li>
+                {{/SHORTTERM_ACTIONS}}
+            </ul>
+
+            <h3 style="font-size: 0.875rem; margin: 1rem 0 0.5rem; color: var(--color-info);">Long-term (Architecture)</h3>
+            <ul class="recommendation-list">
+                {{#LONGTERM_ACTIONS}}
+                <li class="recommendation-item recommendation-longterm">
+                    <span class="recommendation-icon">◎</span>
+                    <span>{{ACTION}}</span>
+                </li>
+                {{/LONGTERM_ACTIONS}}
+            </ul>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Generated by Security Reporter Agent</p>
+            <p>Report Version: {{REPORT_VERSION}} | Generated: {{GENERATED_AT}}</p>
+        </footer>
+    </div>
+</body>
+</html>

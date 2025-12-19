@@ -1,0 +1,393 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://vul-ai.local/schemas/blackboard.schema.json",
+  "title": "Security Analysis Blackboard",
+  "description": "Task blackboard for tracking security analysis state and progress",
+  "type": "object",
+  "required": ["meta", "stages"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "description": "Metadata about the analysis session",
+      "required": ["projectPath", "sessionId", "startedAt", "status", "currentStage"],
+      "properties": {
+        "projectPath": {
+          "type": "string",
+          "description": "Absolute path to the target project"
+        },
+        "sessionId": {
+          "type": "string",
+          "description": "Unique session identifier",
+          "pattern": "^sess-[0-9]+-[0-9]+$",
+          "examples": ["sess-20240101-100000"]
+        },
+        "startedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the analysis started"
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the analysis completed (if finished)"
+        },
+        "status": {
+          "type": "string",
+          "description": "Current status of the analysis",
+          "enum": [
+            "initializing",
+            "running",
+            "paused",
+            "completed",
+            "failed",
+            "cancelled"
+          ]
+        },
+        "currentStage": {
+          "type": "integer",
+          "description": "Current stage number (0-5)",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "config": {
+          "type": "object",
+          "description": "Runtime configuration",
+          "properties": {
+            "autoConfirm": {
+              "type": "boolean",
+              "description": "Whether to auto-confirm at checkpoints",
+              "default": true
+            },
+            "confirmPoints": {
+              "type": "array",
+              "description": "List of confirmation points",
+              "items": {
+                "type": "string",
+                "enum": ["afterThreatModeling", "afterValidation"]
+              }
+            },
+            "maxConcurrency": {
+              "type": "integer",
+              "description": "Maximum concurrent vuln-agents",
+              "minimum": 1,
+              "maximum": 10,
+              "default": 5
+            },
+            "enabledAgents": {
+              "type": "array",
+              "description": "List of enabled vuln-agents",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "stages": {
+      "type": "object",
+      "description": "Status of each analysis stage",
+      "properties": {
+        "initialization": {
+          "$ref": "#/definitions/stageStatus"
+        },
+        "engineering": {
+          "allOf": [
+            { "$ref": "#/definitions/stageStatus" },
+            {
+              "type": "object",
+              "properties": {
+                "agent": {
+                  "type": "string",
+                  "const": "engineering-profiler"
+                },
+                "output": {
+                  "type": "string",
+                  "description": "Output file path"
+                },
+                "summary": {
+                  "type": "object",
+                  "properties": {
+                    "endpointCount": { "type": "integer" },
+                    "assetCount": { "type": "integer" },
+                    "techStack": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "threatModeling": {
+          "allOf": [
+            { "$ref": "#/definitions/stageStatus" },
+            {
+              "type": "object",
+              "properties": {
+                "agent": {
+                  "type": "string",
+                  "const": "threat-modeler"
+                },
+                "output": {
+                  "type": "string",
+                  "description": "Output file path"
+                },
+                "summary": {
+                  "type": "object",
+                  "properties": {
+                    "totalThreats": { "type": "integer" },
+                    "p0Count": { "type": "integer" },
+                    "p1Count": { "type": "integer" },
+                    "p2Count": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "vulnDetection": {
+          "allOf": [
+            { "$ref": "#/definitions/stageStatus" },
+            {
+              "type": "object",
+              "properties": {
+                "agents": {
+                  "type": "object",
+                  "description": "Status of each vuln-agent",
+                  "additionalProperties": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "string",
+                        "enum": ["pending", "running", "completed", "failed", "skipped"]
+                      },
+                      "startedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "completedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "findingsCount": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "outputFile": {
+                        "type": "string",
+                        "description": "Path to findings file"
+                      },
+                      "error": {
+                        "type": "string",
+                        "description": "Error message if failed"
+                      }
+                    }
+                  }
+                },
+                "progress": {
+                  "type": "object",
+                  "description": "Overall progress of vuln detection",
+                  "properties": {
+                    "total": {
+                      "type": "integer",
+                      "description": "Total number of tasks"
+                    },
+                    "completed": {
+                      "type": "integer",
+                      "description": "Completed tasks"
+                    },
+                    "running": {
+                      "type": "integer",
+                      "description": "Currently running tasks"
+                    },
+                    "pending": {
+                      "type": "integer",
+                      "description": "Pending tasks"
+                    },
+                    "failed": {
+                      "type": "integer",
+                      "description": "Failed tasks"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "validation": {
+          "allOf": [
+            { "$ref": "#/definitions/stageStatus" },
+            {
+              "type": "object",
+              "properties": {
+                "agent": {
+                  "type": "string",
+                  "const": "validation-agent"
+                },
+                "output": {
+                  "type": "string",
+                  "description": "Output file path"
+                },
+                "summary": {
+                  "type": "object",
+                  "properties": {
+                    "totalFindings": { "type": "integer" },
+                    "confirmed": { "type": "integer" },
+                    "falsePositives": { "type": "integer" },
+                    "needsReview": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "reporting": {
+          "allOf": [
+            { "$ref": "#/definitions/stageStatus" },
+            {
+              "type": "object",
+              "properties": {
+                "agent": {
+                  "type": "string",
+                  "const": "security-reporter"
+                },
+                "outputs": {
+                  "type": "array",
+                  "description": "List of generated report files",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "findings": {
+      "type": "object",
+      "description": "References to finding files",
+      "properties": {
+        "raw": {
+          "type": "array",
+          "description": "Paths to raw finding files from vuln-agents",
+          "items": {
+            "type": "string"
+          }
+        },
+        "validated": {
+          "type": "array",
+          "description": "Paths to validated vulnerability files",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "errors": {
+      "type": "array",
+      "description": "Errors encountered during analysis",
+      "items": {
+        "type": "object",
+        "required": ["timestamp", "level", "stage", "message"],
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "level": {
+            "type": "string",
+            "enum": ["critical", "error", "warning", "info"]
+          },
+          "stage": {
+            "type": "string",
+            "description": "Stage where error occurred"
+          },
+          "agent": {
+            "type": "string",
+            "description": "Agent that caused the error"
+          },
+          "message": {
+            "type": "string"
+          },
+          "details": {
+            "type": "object",
+            "description": "Additional error details"
+          }
+        }
+      }
+    },
+    "log": {
+      "type": "array",
+      "description": "Activity log",
+      "items": {
+        "type": "object",
+        "required": ["timestamp", "stage", "action"],
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "stage": {
+            "type": "string",
+            "description": "Stage name"
+          },
+          "action": {
+            "type": "string",
+            "description": "Action performed",
+            "enum": [
+              "workspace_created",
+              "stage_started",
+              "stage_completed",
+              "stage_failed",
+              "agent_started",
+              "agent_completed",
+              "agent_failed",
+              "finding_added",
+              "user_confirmed",
+              "error_logged"
+            ]
+          },
+          "agent": {
+            "type": "string",
+            "description": "Agent name if applicable"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable message"
+          },
+          "data": {
+            "type": "object",
+            "description": "Additional data"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "stageStatus": {
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["pending", "running", "completed", "failed", "skipped"]
+        },
+        "startedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "error": {
+          "type": "string",
+          "description": "Error message if failed"
+        }
+      }
+    }
+  }
+}

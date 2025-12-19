@@ -1,0 +1,117 @@
+{
+  "$schema": "https://raw.githubusercontent.com/vul-ai/schemas/main/threat-task-list.schema.json",
+  "meta": {
+    "version": "1.0.0",
+    "generatedAt": "",
+    "generatedBy": "threat-modeler",
+    "sourceProfile": "",
+    "sourceThreatModel": ""
+  },
+  "summary": {
+    "totalTasks": 0,
+    "byPriority": {
+      "P0": 0,
+      "P1": 0,
+      "P2": 0
+    },
+    "byVulnType": {},
+    "byAgent": {},
+    "estimatedEffort": ""
+  },
+  "tasks": [
+    {
+      "id": "THREAT-001",
+      "target": {
+        "path": "/api/login",
+        "method": "POST",
+        "file": "src/routes/auth.js",
+        "line": 25,
+        "function": "handleLogin"
+      },
+      "suspectedVuln": "SQL Injection",
+      "vulnType": "injection",
+      "vulnCategory": "sqli",
+      "priority": "P0",
+      "confidence": "high",
+      "reasoning": "登录端点直接处理用户输入，工程画像显示使用 MySQL，且未发现 ORM 使用",
+      "checkPoints": [
+        {
+          "id": "CP-001",
+          "description": "检查 username 参数是否拼接 SQL",
+          "status": "pending"
+        },
+        {
+          "id": "CP-002",
+          "description": "检查 password 参数是否参数化",
+          "status": "pending"
+        },
+        {
+          "id": "CP-003",
+          "description": "检查是否使用 ORM/PreparedStatement",
+          "status": "pending"
+        }
+      ],
+      "relatedAssets": [
+        {
+          "type": "database",
+          "name": "mysql-main",
+          "connection": "src/config/db.js:10"
+        }
+      ],
+      "relatedThreats": ["THREAT-005", "THREAT-012"],
+      "suggestedAgent": "sqli-agent",
+      "cwes": ["CWE-89"],
+      "references": [
+        "https://owasp.org/www-community/attacks/SQL_Injection"
+      ],
+      "status": "pending",
+      "assignedTo": null,
+      "result": null
+    }
+  ],
+  "taskGroups": [
+    {
+      "name": "SQL Injection Detection",
+      "description": "检测所有可能的 SQL 注入点",
+      "agent": "sqli-agent",
+      "taskIds": ["THREAT-001", "THREAT-005"],
+      "priority": "P0",
+      "estimatedTasks": 5
+    },
+    {
+      "name": "File Upload Security",
+      "description": "检测文件上传相关漏洞",
+      "agent": "file-upload-agent",
+      "taskIds": ["THREAT-002"],
+      "priority": "P0",
+      "estimatedTasks": 2
+    }
+  ],
+  "executionPlan": {
+    "phases": [
+      {
+        "phase": 1,
+        "name": "Critical Vulnerabilities",
+        "description": "处理所有 P0 级别威胁",
+        "taskGroups": ["SQL Injection Detection", "File Upload Security"],
+        "parallelizable": true
+      },
+      {
+        "phase": 2,
+        "name": "High Priority",
+        "description": "处理 P1 级别威胁",
+        "taskGroups": [],
+        "parallelizable": true
+      },
+      {
+        "phase": 3,
+        "name": "Medium Priority",
+        "description": "处理 P2 级别威胁",
+        "taskGroups": [],
+        "parallelizable": true
+      }
+    ],
+    "dependencies": [],
+    "estimatedTotalTime": ""
+  }
+}

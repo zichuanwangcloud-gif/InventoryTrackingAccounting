@@ -1,0 +1,185 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://vul-ai.local/schemas/findings-file.schema.json",
+  "title": "Findings File",
+  "description": "Standard format for vuln-agent output files in findings/ directory",
+  "type": "object",
+  "required": [
+    "agent",
+    "sessionId",
+    "timestamp",
+    "summary",
+    "findings"
+  ],
+  "properties": {
+    "agent": {
+      "type": "string",
+      "description": "The agent that generated this file",
+      "enum": [
+        "sqli-agent",
+        "xss-agent",
+        "ssrf-agent",
+        "rce-agent",
+        "sast-agent",
+        "fuzz-agent",
+        "sca-agent"
+      ]
+    },
+    "sessionId": {
+      "type": "string",
+      "description": "Session identifier from orchestrator",
+      "pattern": "^sess-[0-9]+-[0-9]+$",
+      "examples": ["sess-20240101-100000"]
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when the analysis completed"
+    },
+    "target": {
+      "type": "string",
+      "description": "Target project path or description"
+    },
+    "summary": {
+      "type": "object",
+      "description": "Summary statistics of findings",
+      "required": ["total", "bySeverity"],
+      "properties": {
+        "total": {
+          "type": "integer",
+          "description": "Total number of findings",
+          "minimum": 0
+        },
+        "bySeverity": {
+          "type": "object",
+          "description": "Breakdown by severity level",
+          "properties": {
+            "critical": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "high": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "medium": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "low": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "info": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        },
+        "byConfidence": {
+          "type": "object",
+          "description": "Breakdown by confidence level",
+          "properties": {
+            "high": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "medium": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "low": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "description": "List of vulnerability findings",
+      "items": {
+        "$ref": "finding.schema.json"
+      }
+    },
+    "tasksProcessed": {
+      "type": "array",
+      "description": "Status of processed threat tasks",
+      "items": {
+        "type": "object",
+        "required": ["taskId", "status"],
+        "properties": {
+          "taskId": {
+            "type": "string",
+            "description": "Reference to the threat task",
+            "pattern": "^THREAT-[0-9]+$"
+          },
+          "status": {
+            "type": "string",
+            "description": "Processing status",
+            "enum": ["completed", "failed", "skipped", "partial"]
+          },
+          "findings": {
+            "type": "integer",
+            "description": "Number of findings from this task",
+            "minimum": 0
+          },
+          "error": {
+            "type": "string",
+            "description": "Error message if failed"
+          }
+        }
+      }
+    },
+    "errors": {
+      "type": "array",
+      "description": "Errors encountered during analysis",
+      "items": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "level": {
+            "type": "string",
+            "enum": ["error", "warning"]
+          },
+          "message": {
+            "type": "string"
+          },
+          "context": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "analysisMetrics": {
+      "type": "object",
+      "description": "Performance metrics for the analysis",
+      "properties": {
+        "totalTime": {
+          "type": "number",
+          "description": "Total analysis time in seconds"
+        },
+        "filesAnalyzed": {
+          "type": "integer",
+          "description": "Number of files analyzed"
+        },
+        "linesOfCode": {
+          "type": "integer",
+          "description": "Lines of code analyzed"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,153 @@
+{
+  "$schema": "https://raw.githubusercontent.com/vul-ai/schemas/main/engineering-profile.schema.json",
+  "meta": {
+    "version": "1.0.0",
+    "generatedAt": "",
+    "generatedBy": "engineering-profiler",
+    "projectRoot": ""
+  },
+  "project": {
+    "name": "",
+    "description": "",
+    "version": "",
+    "license": "",
+    "repository": ""
+  },
+  "techStack": {
+    "languages": [
+      {
+        "name": "",
+        "version": "",
+        "primary": true
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "",
+        "version": "",
+        "type": "backend|frontend|fullstack"
+      }
+    ],
+    "databases": [
+      {
+        "type": "",
+        "name": "",
+        "driver": ""
+      }
+    ],
+    "cache": [],
+    "messageQueue": [],
+    "infrastructure": {
+      "containerization": "",
+      "orchestration": "",
+      "cicd": "",
+      "deployment": ""
+    }
+  },
+  "structure": {
+    "rootDirectories": [
+      {
+        "name": "",
+        "purpose": "",
+        "keyFiles": []
+      }
+    ],
+    "modules": [
+      {
+        "name": "",
+        "path": "",
+        "type": "core|feature|util|config",
+        "description": "",
+        "dependencies": []
+      }
+    ],
+    "entryPoints": [
+      {
+        "file": "",
+        "type": "main|router|handler"
+      }
+    ]
+  },
+  "endpoints": [
+    {
+      "path": "",
+      "method": "GET|POST|PUT|DELETE|PATCH",
+      "file": "",
+      "line": 0,
+      "function": "",
+      "category": "auth|user|file|admin|data|payment|task|other",
+      "description": "",
+      "authRequired": false,
+      "parameters": [],
+      "middlewares": []
+    }
+  ],
+  "assets": {
+    "configFiles": [
+      {
+        "path": "",
+        "type": "env|json|yaml|js|properties",
+        "purpose": "",
+        "sensitivity": "low|medium|high|critical",
+        "variables": []
+      }
+    ],
+    "secretLocations": [
+      {
+        "file": "",
+        "line": 0,
+        "type": "api_key|password|token|certificate|private_key|connection_string",
+        "variableName": "",
+        "notes": ""
+      }
+    ],
+    "databaseConnections": [
+      {
+        "file": "",
+        "line": 0,
+        "type": "mysql|postgresql|mongodb|redis|sqlite|other",
+        "connectionMethod": "",
+        "notes": ""
+      }
+    ],
+    "sensitiveFields": [
+      {
+        "file": "",
+        "line": 0,
+        "fieldName": "",
+        "fieldType": "password|token|secret|financial|pii",
+        "context": "model|schema|interface|variable"
+      }
+    ],
+    "externalServices": [
+      {
+        "name": "",
+        "type": "api|sdk|webhook",
+        "configLocation": "",
+        "notes": ""
+      }
+    ]
+  },
+  "statistics": {
+    "totalFiles": 0,
+    "totalDirectories": 0,
+    "estimatedLOC": 0,
+    "filesByType": {},
+    "endpointCount": {
+      "total": 0,
+      "byMethod": {},
+      "byCategory": {}
+    },
+    "assetCount": {
+      "configFiles": 0,
+      "secretLocations": 0,
+      "databaseConnections": 0,
+      "sensitiveFields": 0
+    }
+  },
+  "recommendations": {
+    "security": [],
+    "architecture": [],
+    "documentation": []
+  }
+}
