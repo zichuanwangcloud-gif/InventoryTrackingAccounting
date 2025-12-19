@@ -5,6 +5,7 @@
 ```text
 docs/
 ├── README.md                                  # 文档总览（本文件）
+├── PROGRESS.md                                # 功能进度追踪（快速查询功能完成状态）
 ├── business/                                  # 业务文档（PRD/用户故事/版本索引）
 │   ├── PRD.md                                 # 当前主 PRD（总览）
 │   ├── PRD-V1.0.md                            # V1.0 需求说明
@@ -81,9 +82,11 @@ docs/
 
 ## 🚀 快速导航
 
-- 业务与需求  
-  - [产品需求文档（主 PRD）](./business/PRD.md)  
-  - [V1.0 需求说明](./business/PRD-V1.0.md)  
+- **功能进度追踪**（推荐首看）
+  - [PROGRESS.md](./PROGRESS.md) — 快速查询"功能X做完了吗"
+- 业务与需求
+  - [产品需求文档（主 PRD）](./business/PRD.md)
+  - [V1.0 需求说明](./business/PRD-V1.0.md)
   - [PRD 版本索引](./business/PRD_INDEX.md)  
 - 架构与技术方案  
   - [系统架构设计](./technical/ARCHITECTURE.md)  

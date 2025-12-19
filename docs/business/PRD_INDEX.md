@@ -1,5 +1,8 @@
 # PRD文档索引 - 个人物品库存与记账系统
 
+> **当前实现版本**：**V1.0（MVP）** — 后端/前端主要功能已完成，约 65-70% 进度
+> **版本状态说明**：✅ 已实现 / ⚠️ 开发中 / 📝 规划中（详见 [PROGRESS.md](../PROGRESS.md)）
+
 ## 📋 文档概览
 
 本文档索引提供了个人物品库存与记账系统所有PRD文档的导航和概览，遵循敏捷开发原则，按版本进行详细拆分。
@@ -167,9 +170,9 @@
 - [技术规格文档](../technical/TECH_SPEC_V1.md) - 技术实现规格
 
 ### 运维文档
-- [部署指南](../operations/DEPLOYMENT.md) - 系统部署说明
-- [监控告警](../operations/MONITORING.md) - 系统监控配置
-- [故障处理](../operations/TROUBLESHOOTING.md) - 故障处理流程
+- [部署指南](../operations/DEPLOYMENT.md) - 系统部署说明（含监控、故障排查章节）
+
+> 注：监控告警和故障处理内容目前集中在 `DEPLOYMENT.md` 文档中。
 
 ## 📞 联系方式
 

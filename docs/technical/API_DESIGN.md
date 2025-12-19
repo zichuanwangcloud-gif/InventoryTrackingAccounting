@@ -1,5 +1,11 @@
 # API设计文档
 
+> **相关文档**：
+> - **具体API端点与实现状态**：见 [API_SPECIFICATION.md](./API_SPECIFICATION.md)
+> - **功能进度追踪**：见 [PROGRESS.md](../PROGRESS.md)
+
+---
+
 ## 1. API设计原则
 
 ### 1.1 RESTful设计
